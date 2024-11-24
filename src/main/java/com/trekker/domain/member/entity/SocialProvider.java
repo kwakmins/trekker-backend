@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,17 @@ public class SocialProvider {
     @Column(name = "provider_id", unique = true)
     private String providerId;
 
+    @Builder
+    public SocialProvider(Long id, String provider, String providerId) {
+        this.id = id;
+        this.provider = provider;
+        this.providerId = providerId;
+    }
+
+    public static SocialProvider toSocialProvider(String provider, String providerId) {
+        return SocialProvider.builder()
+                .provider(provider)
+                .providerId(providerId)
+                .build();
+    }
 }

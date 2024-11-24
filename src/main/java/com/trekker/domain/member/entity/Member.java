@@ -7,10 +7,11 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import com.trekker.global.entity.BaseEntity;
 import jakarta.persistence.*;
 
+import javax.lang.model.element.Name;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 
 @Entity
@@ -40,8 +41,27 @@ public class Member extends BaseEntity {
     @Column(name = "name", length = MAX_NAME_LENGTH)
     private String name;
 
-    @OneToOne(fetch = LAZY)
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "social_provider_id")
     private SocialProvider socialProvider;
+
+    @Builder
+    public Member(Long id, String email, Role role, String name, SocialProvider socialProvider) {
+        this.id = id;
+        this.email = email;
+        this.role = role;
+        this.name = name;
+        this.socialProvider = socialProvider;
+    }
+
+    public static Member toMember(String email, Role role, String provider, String providerId) {
+        SocialProvider socialProvider = SocialProvider.toSocialProvider(provider, providerId);
+
+        return Member.builder()
+                .email(email)
+                .role(role)
+                .socialProvider(socialProvider)
+                .build();
+    }
 
 }

@@ -73,6 +73,6 @@ public class AuthService {
         unlinkService.unlink(member);
 
         // 회원 삭제
-        memberRepository.delete(member);
+        member.markAsDeleted();
     }
 }

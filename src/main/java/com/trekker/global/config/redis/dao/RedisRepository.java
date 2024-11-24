@@ -35,13 +35,13 @@ public class RedisRepository {
             HashMap<String, Object> tokenDataMap = createTokenDataMap(tokenData);
 
             // 해시로 데이터 저장
-            hashOperations.putAll(tokenData.getUserAccount(), tokenDataMap);
+            hashOperations.putAll(tokenData.userAccount(), tokenDataMap);
 
             // 만료 시간 설정 (1주일)
             boolean isExpireSet = Boolean.TRUE.equals(
-                    redisTemplate.expire(tokenData.getUserAccount(), 7, TimeUnit.DAYS));
+                    redisTemplate.expire(tokenData.userAccount(), 7, TimeUnit.DAYS));
             if (!isExpireSet) {
-                log.warn("TTL 설정에 실패했습니다. userAccount: {}", tokenData.getUserAccount());
+                log.warn("TTL 설정에 실패했습니다. userAccount: {}", tokenData.userAccount());
             }
         } catch (RedisConnectionFailureException e) {
             log.error("Redis 연결 실패", e);
@@ -95,8 +95,8 @@ public class RedisRepository {
      */
     private HashMap<String, Object> createTokenDataMap(RefreshTokenInfoDto tokenData) {
         HashMap<String, Object> tokenDataMap = new HashMap<>();
-        tokenDataMap.put("refreshToken", tokenData.getRefreshToken());
-        tokenDataMap.put("authorities", tokenData.getAuthorities());
+        tokenDataMap.put("refreshToken", tokenData.refreshToken());
+        tokenDataMap.put("authorities", tokenData.authorities());
         return tokenDataMap;
     }
 

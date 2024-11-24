@@ -162,9 +162,7 @@ public class RedisRepository {
     public String fetchAndDeleteSocialRefreshToken(String userAccount) {
         String redisKey = SOCIAL_TOKEN_REDIS_KEY + userAccount;
         String refreshToken = (String) redisTemplate.opsForValue().get(redisKey);
-        if (refreshToken != null) {
-            redisTemplate.delete(redisKey); // 조회 후 삭제
-        }
+        redisTemplate.delete(redisKey); // 조회 후 삭제
         return refreshToken;
     }
 

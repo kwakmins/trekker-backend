@@ -1,20 +1,16 @@
 package com.trekker.domain.member.entity;
 
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import com.trekker.global.entity.AuditBaseEntity;
 import com.trekker.global.entity.BaseEntity;
 import jakarta.persistence.*;
 
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.UUID;
 
 
 @Entity
@@ -43,5 +39,9 @@ public class Member extends BaseEntity {
     // 회원의 이름
     @Column(name = "name", length = MAX_NAME_LENGTH)
     private String name;
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "social_provider_id")
+    private SocialProvider socialProvider;
 
 }

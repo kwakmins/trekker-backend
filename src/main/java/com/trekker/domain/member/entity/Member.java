@@ -7,7 +7,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import com.trekker.global.entity.BaseEntity;
 import jakarta.persistence.*;
 
-import javax.lang.model.element.Name;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

@@ -49,7 +49,8 @@ public class SecurityConfig {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers("/api/v1/auth/refresh",
                                         "/api/v1/auth/issue-final-token"
-                                        , "/login/oauth2/**", "/oauth2/**").permitAll()
+                                        , "/login/oauth2/**", "/oauth2/**", "/error",
+                                        "/favicon.ico").permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(customAuthenticationEntryPoint)

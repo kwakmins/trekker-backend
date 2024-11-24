@@ -26,7 +26,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final RedisRepository redisRepository;
     private final OAuth2AuthorizedClientService authorizedClientService;
     private static final String TEMP_TOKEN_NAME = "tempToken";
-    private static final String GUEST = "isGuest";
     private static final String USER_ACCOUNT = "account";
     private static final String SUCCESS_URL = "http://localhost:3000/success-page";
 

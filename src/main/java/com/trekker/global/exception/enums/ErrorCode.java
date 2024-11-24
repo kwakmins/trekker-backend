@@ -1,4 +1,4 @@
-package com.trekker.global.config.exception.enums;
+package com.trekker.global.exception.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

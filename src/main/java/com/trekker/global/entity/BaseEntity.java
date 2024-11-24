@@ -1,4 +1,4 @@
-package com.trekker.global.config.entity;
+package com.trekker.global.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 

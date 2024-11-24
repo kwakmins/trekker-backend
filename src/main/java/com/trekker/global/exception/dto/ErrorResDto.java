@@ -1,6 +1,6 @@
-package com.trekker.global.config.exception.dto;
+package com.trekker.global.exception.dto;
 
-import com.trekker.global.config.exception.enums.ErrorCode;
+import com.trekker.global.exception.enums.ErrorCode;
 import lombok.Builder;
 
 @Builder

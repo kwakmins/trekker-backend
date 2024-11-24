@@ -1,4 +1,4 @@
-package com.trekker.global.config.entity;
+package com.trekker.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

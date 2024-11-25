@@ -40,7 +40,7 @@ public class Member extends BaseEntity {
     @Column(name = "name", length = MAX_NAME_LENGTH)
     private String name;
 
-    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "social_provider_id")
     private SocialProvider socialProvider;
 

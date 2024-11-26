@@ -8,10 +8,20 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query("select m from Member m join fetch m.socialProvider s where m.email =:email")
+    @Query("""
+            SELECT m 
+            FROM Member m 
+            JOIN FETCH m.socialProvider s 
+            WHERE m.email =:email 
+            """)
     Optional<Member> findByEmail(@Param("email") String email);
 
-    @Query("select m from Member m join fetch m.socialProvider s where s.provider =:provider and s.providerId =:providerId")
+    @Query("""
+            SELECT m 
+            FROM Member m 
+            JOIN FETCH m.socialProvider s 
+            WHERE s.provider =:provider AND s.providerId =:providerId
+            """)
     Optional<Member> findByProviderAndProviderId(@Param("provider") String provider,
             @Param("providerId") String providerId);
 }

@@ -28,6 +28,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final OAuth2AuthorizedClientService authorizedClientService;
     private static final String TEMP_TOKEN_NAME = "tempToken";
     private static final String USER_ACCOUNT = "account";
+    private static final String IS_COMPLETED = "isCompleted";
 
     @Value("${login.success-url}")
     private String SUCCESS_URL;
@@ -53,6 +54,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         String redirectUrl = UriComponentsBuilder.fromUriString(SUCCESS_URL)
                 .queryParam(TEMP_TOKEN_NAME, tempToken)
                 .queryParam(USER_ACCOUNT, account)
+                .queryParam(IS_COMPLETED, oAuth2User.getIsCompleted())
                 .build().toUriString();
 
         response.sendRedirect(redirectUrl); // 프론트엔드로 리다이렉트
@@ -88,4 +90,3 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         return null;
     }
 }
-

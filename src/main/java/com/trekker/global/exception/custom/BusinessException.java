@@ -1,6 +1,6 @@
-package com.trekker.global.config.exception.custom;
+package com.trekker.global.exception.custom;
 
-import com.trekker.global.config.exception.enums.ErrorCode;
+import com.trekker.global.exception.enums.ErrorCode;
 import lombok.Getter;
 
 @Getter

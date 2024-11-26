@@ -1,8 +1,8 @@
-package com.trekker.global.config.exception;
+package com.trekker.global.exception;
 
-import com.trekker.global.config.exception.custom.BusinessException;
-import com.trekker.global.config.exception.dto.ErrorResDto;
-import com.trekker.global.config.exception.enums.ErrorCode;
+import com.trekker.global.exception.custom.BusinessException;
+import com.trekker.global.exception.dto.ErrorResDto;
+import com.trekker.global.exception.enums.ErrorCode;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

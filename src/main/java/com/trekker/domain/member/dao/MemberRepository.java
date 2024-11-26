@@ -19,7 +19,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("""
             SELECT m 
             FROM Member m 
-            JOIN FETCH m.socialProvider s 
+            JOIN FETCH m.socialProvider s
+            JOIN FETCH m.onboarding o
             WHERE s.provider =:provider AND s.providerId =:providerId
             """)
     Optional<Member> findByProviderAndProviderId(@Param("provider") String provider,

@@ -83,5 +83,16 @@ public class Member extends BaseEntity {
                 .build();
     }
 
+    public void updateOnboarding(OnboardingReqDto onboardingReqDto) {
+        Job job = Job.toJob(onboardingReqDto.jobName());
+        this.name = onboardingReqDto.name();
+        this.job = job;
 
+        if (onboardingReqDto.projectAddDto() != null) {
+            Project project = onboardingReqDto.projectAddDto().toEntity();
+            project.updateMember(this);
+            this.projectList.add(project);
+        }
+        onboarding.updateCompleted();
+    }
 }

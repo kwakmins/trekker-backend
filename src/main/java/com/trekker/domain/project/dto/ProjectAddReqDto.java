@@ -1,14 +1,16 @@
 package com.trekker.domain.project.dto;
 
 import com.trekker.domain.project.entity.Project;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record ProjectAddReqDto(
-        String title,
-        String description,
-        LocalDate startDate,
+        @NotNull String title,
+        @NotNull String description,
+        @NotNull LocalDate startDate,
         LocalDate endDate,
-        String type // 프로젝트 유형 (개인 , 팀)
+        @NotNull String type // 프로젝트 유형 (개인 , 팀)
 ) {
 
     public Project toEntity() {

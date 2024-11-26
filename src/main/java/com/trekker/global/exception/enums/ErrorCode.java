@@ -25,7 +25,8 @@ public enum ErrorCode {
     UNSUPPORTED_SOCIAL_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 소셜 제공자입니다."),
 
     //Member
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다.");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
+    ONBOARDING_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "온보딩을 이미 완료했습니다.");
 
     //오류 상태코드
     private final HttpStatus httpStatus;

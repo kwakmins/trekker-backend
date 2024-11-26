@@ -27,6 +27,9 @@ public class RedisRepository {
      */
     public void storeRefreshToken(RefreshTokenInfoDto tokenData) {
         try {
+            // 기존 데이터 삭제
+            redisTemplate.delete(tokenData.userAccount());
+
             HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
             hashOperations.putAll(tokenData.userAccount(), createTokenDataMap(tokenData));
             redisTemplate.expire(tokenData.userAccount(), 7, TimeUnit.DAYS);

@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.trekker.global.auth.application.AuthService;
 import com.trekker.global.auth.dto.req.RefreshTokenReqDto;
 import com.trekker.global.auth.dto.res.AuthResDto;
+import com.trekker.global.auth.dto.res.RefreshTokenResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +38,23 @@ public class AuthController {
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/access/refresh")
     public ResponseEntity<AuthResDto> refreshAccessToken(
             @RequestBody RefreshTokenReqDto refreshTokenRequestDto
     ) {
         AuthResDto authResponseDto = authService.refreshAccessToken(
                 refreshTokenRequestDto.refreshToken());
         return ResponseEntity.ok(authResponseDto);
+    }
+
+    @PostMapping("/refresh/reissue")
+    public ResponseEntity<RefreshTokenResDto> reissueRefreshToken(
+            @RequestBody RefreshTokenReqDto refreshTokenRequestDto
+    ) {
+        RefreshTokenResDto refreshTokenResDto = authService.reissueRefreshToken(
+                refreshTokenRequestDto.refreshToken());
+
+        return ResponseEntity.ok(refreshTokenResDto);
     }
 
     /**

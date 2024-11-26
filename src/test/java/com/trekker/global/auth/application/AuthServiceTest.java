@@ -2,7 +2,6 @@ package com.trekker.global.auth.application;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
@@ -15,13 +14,11 @@ import com.trekker.global.config.security.TokenProvider;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,7 +59,7 @@ class AuthServiceTest {
         // given
         String refreshToken = "validJwtToken";
         String newToken = "newValidJwtToken";
-        AuthResDto authResDto = new AuthResDto(newToken, newToken);
+        AuthResDto authResDto = new AuthResDto(newToken, newToken, false);
 
         when(tokenProvider.refreshAccessToken(refreshToken)).thenReturn(authResDto);
 
@@ -95,7 +92,7 @@ class AuthServiceTest {
         // given
         String tempToken = "tempToken";
         String validToken = "validJwtToken";
-        AuthResDto authResDto = new AuthResDto(validToken, validToken);
+        AuthResDto authResDto = new AuthResDto(validToken, validToken, false);
 
         when(redisRepository.retrieveAuthResponse(tempToken)).thenReturn(authResDto);
 

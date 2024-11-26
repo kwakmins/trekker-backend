@@ -3,6 +3,7 @@ package com.trekker.global.auth.application;
 import com.trekker.domain.member.dao.MemberRepository;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.global.auth.dto.res.AuthResDto;
+import com.trekker.global.auth.dto.res.RefreshTokenResDto;
 import com.trekker.global.config.redis.dao.RedisRepository;
 import com.trekker.global.config.security.TokenProvider;
 import com.trekker.global.exception.custom.BusinessException;
@@ -42,6 +43,22 @@ public class AuthService {
         // JwtTokenProvider 에서 Refresh 토큰 유효성 검사 및 Access 토큰 재발급
         try {
             return tokenProvider.refreshAccessToken(refreshToken);
+        } catch (BusinessException e) {
+            throw new BusinessException(refreshToken, "refreshToken",
+                    ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+    }
+
+    /**
+     * Refresh 토큰 만료시 Refresh 토큰 갱신
+     *
+     * @param refreshToken 클라이언트로부터 전달받은 기존 Refresh 토큰
+     * @return RefreshTokenResDto 새로 생성된 Refresh 토큰
+     */
+    public RefreshTokenResDto reissueRefreshToken(String refreshToken) {
+        // JwtTokenProvider 에서 Refresh 토큰 유효성 검사 및 Access 토큰 재발급
+        try {
+            return tokenProvider.reissueRefreshToken(refreshToken);
         } catch (BusinessException e) {
             throw new BusinessException(refreshToken, "refreshToken",
                     ErrorCode.INVALID_REFRESH_TOKEN);

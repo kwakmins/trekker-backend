@@ -25,10 +25,11 @@ public class UnlinkService {
     private final RedisRepository redisRepository;
 
     @Value("${kakao.admin-key}")
-    private String kakaoAdminKey;
-
-    private static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
-    private static final String GOOGLE_REVOKE_URL = "https://oauth2.googleapis.com/revoke";
+    private String KAKAO_ADMIN_KEY;
+    @Value("${kakao.unlink-url}")
+    private String KAKAO_UNLINK_URL;
+    @Value("${google.unlink-url}")
+    private String GOOGLE_UNLINK_URL;
 
     /**
      * 소셜 계정 연결 해제
@@ -63,7 +64,7 @@ public class UnlinkService {
      */
     private void unlinkKakao(String providerId) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + kakaoAdminKey);
+        headers.set("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
@@ -94,7 +95,7 @@ public class UnlinkService {
             throw new BusinessException(email, "refreshToken", ErrorCode.SOCIAL_UNLINK_FAILED);
         }
 
-        String url = GOOGLE_REVOKE_URL + "?token=" + refreshToken;
+        String url = GOOGLE_UNLINK_URL + "?token=" + refreshToken;
 
         try {
             restTemplate.postForEntity(url, null, String.class);

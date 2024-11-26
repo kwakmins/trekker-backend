@@ -1,5 +1,7 @@
 jwt:
   secret: ${JWT_SECRET}
+login:
+  success-url: http://localhost:3000/success-page
 
 spring:
   security:
@@ -36,4 +38,8 @@ spring:
             user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
 
 kakao:
+  unlink-url: https://kapi.kakao.com/v1/user/unlink
   admin-key: ${KAKAO_ADMIN_KEY}
+
+google:
+  unlink-url: https://oauth2.googleapis.com/revoke

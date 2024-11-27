@@ -2,10 +2,11 @@ package com.trekker.domain.project.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.trekker.domain.member.entity.Job;
 import com.trekker.domain.member.entity.Member;
+import com.trekker.domain.project.dto.ProjectReqDto;
 import com.trekker.global.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
+import com.trekker.global.exception.custom.BusinessException;
+import com.trekker.global.exception.enums.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -65,5 +65,17 @@ public class Project extends BaseEntity {
         this.isCompleted = isCompleted;
         this.member = member;
     }
+    public void validateOwner(Member member) {
+        if (!this.member.equals(member)) {
+            throw new BusinessException(member.getEmail(), "email", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+    }
 
+    public void updateProject(ProjectReqDto projectReqDto) {
+        this.type = projectReqDto.type();
+        this.title = projectReqDto.title();
+        this.description = projectReqDto.description();
+        this.startDate = projectReqDto.startDate();
+        this.endDate = projectReqDto.endDate();
+    }
 }

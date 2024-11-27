@@ -66,7 +66,4 @@ public class Project extends BaseEntity {
         this.member = member;
     }
 
-    public void updateMember(Member member) {
-        this.member = member;
-    }
 }

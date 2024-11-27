@@ -29,7 +29,8 @@ public enum ErrorCode {
     MEMBER_ONBOARDING_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "온보딩을 이미 완료했습니다."),
 
     //Project
-    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트 정보를 찾을 수 없습니다.");
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트 정보를 찾을 수 없습니다."),
+    PROJECT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
 
     //오류 상태코드
     private final HttpStatus httpStatus;

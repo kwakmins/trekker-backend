@@ -27,6 +27,9 @@ public class ProjectService {
         // 회원 조회 및 검증
         Member member = findMemberByEmail(email);
 
+        // 종료 날짜가 시작 날짜보다 이전인지 검증
+        validateProjectDates(projectReqDto);
+
         // dto를 Entity로 변경
         Project project = projectReqDto.toEntity(member);
 
@@ -61,6 +64,9 @@ public class ProjectService {
         // 회원 및 프로젝트 조회 및 검증
         Member member = findMemberByEmail(email);
         Project project = findProjectByIdWithMember(projectId);
+
+        // 종료 날짜가 시작 날짜보다 이전인지 검증
+        validateProjectDates(projectReqDto);
 
         // 회원이 프로젝트 소유자인지 검증
         project.validateOwner(member);
@@ -107,6 +113,17 @@ public class ProjectService {
                         () -> new BusinessException(projectId, "projectId",
                                 ErrorCode.PROJECT_NOT_FOUND)
                 );
+    }
+
+    /**
+     * 종료날자가 시작 날짜 이전인지 검증
+     */
+    private static void validateProjectDates(ProjectReqDto projectReqDto) {
+        if (projectReqDto.endDate() != null) {
+            if (projectReqDto.endDate().isBefore(projectReqDto.startDate())) {
+                throw new BusinessException(projectReqDto.endDate(), "endDate", ErrorCode.PROJECT_BAD_REQUEST);
+            }
+        }
     }
 
 

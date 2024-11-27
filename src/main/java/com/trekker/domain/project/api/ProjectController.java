@@ -5,10 +5,9 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.trekker.domain.project.application.ProjectService;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
-import com.trekker.domain.project.dto.res.ProjectResDto;
+import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,13 +37,13 @@ public class ProjectController {
         return ResponseEntity.status(CREATED).body(projectId);
     }
     @GetMapping
-    public ResponseEntity<List<ProjectResDto>> getProjectList(
+    public ResponseEntity<ProjectWithMemberInfoResDto> getProjectList(
             @LoginMember String email,
             @RequestParam(required = false) String type
-    ){
-        List<ProjectResDto> projectList = projectService.getProjectList(email, type);
+    ) {
+        ProjectWithMemberInfoResDto resDto = projectService.getProjectList(email, type);
 
-        return ResponseEntity.ok(projectList);
+        return ResponseEntity.ok(resDto);
     }
 
 
@@ -68,6 +67,5 @@ public class ProjectController {
 
         return ResponseEntity.status(NO_CONTENT).build();
     }
-
 }
 

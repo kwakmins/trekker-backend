@@ -62,7 +62,7 @@ public class Member extends BaseEntity {
 
     @Builder
     public Member(Long id, String email, Role role, String name, SocialProvider socialProvider,
-            Job job, Onboarding onboarding) {
+            Job job, Onboarding onboarding, List<Project> projectList) {
         this.id = id;
         this.email = email;
         this.role = role;
@@ -70,6 +70,7 @@ public class Member extends BaseEntity {
         this.job = job;
         this.onboarding = onboarding;
         this.socialProvider = socialProvider;
+        this.projectList = projectList;
     }
 
     public static Member toMember(String email, Role role, String provider, String providerId) {

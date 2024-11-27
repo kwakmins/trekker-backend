@@ -30,6 +30,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("""
            SELECT m
            FROM Member m
+           JOIN FETCH m.job
            LEFT JOIN FETCH m.projectList p
            WHERE m.email = :email
            AND (p IS NULL OR (p.isCompleted = false AND (:type IS NULL OR p.type = :type)))

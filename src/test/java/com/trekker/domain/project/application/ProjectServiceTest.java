@@ -5,10 +5,11 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 
 import com.trekker.domain.member.dao.MemberRepository;
+import com.trekker.domain.member.entity.Job;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dao.ProjectRepository;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
-import com.trekker.domain.project.dto.res.ProjectResDto;
+import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
 import com.trekker.domain.project.entity.Project;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
+
     @InjectMocks
     private ProjectService projectService;
     @Mock
@@ -40,6 +42,7 @@ class ProjectServiceTest {
                 .email(email)
                 .build();
     }
+
     @DisplayName("새로운 프로젝트를 추가한다.")
     @Test
     void addProject() {
@@ -61,6 +64,7 @@ class ProjectServiceTest {
         //then
         assertThat(projectId).isEqualTo(saveProject.getId());
     }
+
     @DisplayName("종료 날짜가 시작 날짜보다 이전인 경우 프로젝트 추가에 실패한다.")
     @Test
     void addProjectFailDueToInvalidDates() {
@@ -85,25 +89,29 @@ class ProjectServiceTest {
     @Test
     void getProjectList() {
         // given
-        Member mockMember = mock(Member.class);
         Project project = Project.builder()
                 .id(1L)
-                .member(mockMember)
                 .title("Test Project")
                 .startDate(LocalDate.now())
                 .type("개인")
                 .build();
         List<Project> projects = List.of(project);
 
-        when(memberRepository.findMemberByEmailWithProjectList(email, "개인")).thenReturn(Optional.of(mockMember));
-        when(mockMember.getProjectList()).thenReturn(projects);
+        Member mockMember = Member.builder()
+                .name("테스트")
+                .job(Job.toJob("백엔드"))
+                .projectList(projects)
+                .build();
+
+        when(memberRepository.findMemberByEmailWithProjectList(email, "개인")).thenReturn(
+                Optional.of(mockMember));
 
         // when
-        List<ProjectResDto> projectList = projectService.getProjectList(email, "개인");
+        ProjectWithMemberInfoResDto resDto = projectService.getProjectList(email, "개인");
 
         // then
-        assertThat(projectList.size()).isEqualTo(1);
-        assertThat(projectList.get(0).title()).isEqualTo(project.getTitle());
+        assertThat(resDto.projectList().size()).isEqualTo(1);
+        assertThat(resDto.projectList().get(0).title()).isEqualTo(project.getTitle());
 
     }
 
@@ -125,7 +133,8 @@ class ProjectServiceTest {
                 .startDate(LocalDate.now())
                 .build();
 
-        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(Optional.of(project));
+        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
+                Optional.of(project));
         when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
 
         //when
@@ -144,7 +153,8 @@ class ProjectServiceTest {
                 .member(mockMember)
                 .build();
 
-        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(Optional.of(project));
+        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
+                Optional.of(project));
         when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
 
         // when
@@ -185,7 +195,8 @@ class ProjectServiceTest {
                 .build();
 
         when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
-        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(Optional.of(project));
+        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
+                Optional.of(project));
 
         // when & then
         assertThatThrownBy(() -> projectService.deleteProject(email, project.getId()))

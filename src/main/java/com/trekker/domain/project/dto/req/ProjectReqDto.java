@@ -1,4 +1,4 @@
-package com.trekker.domain.project.dto;
+package com.trekker.domain.project.dto.req;
 
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.entity.Project;

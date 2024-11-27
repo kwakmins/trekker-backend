@@ -1,6 +1,6 @@
 package com.trekker.domain.member.dto;
 
-import com.trekker.domain.project.dto.ProjectReqDto;
+import com.trekker.domain.project.dto.req.ProjectReqDto;
 import jakarta.validation.constraints.NotNull;
 
 public record OnboardingReqDto(

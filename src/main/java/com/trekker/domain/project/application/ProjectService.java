@@ -3,10 +3,13 @@ package com.trekker.domain.project.application;
 import com.trekker.domain.member.dao.MemberRepository;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dao.ProjectRepository;
-import com.trekker.domain.project.dto.ProjectReqDto;
+import com.trekker.domain.project.dto.req.ProjectReqDto;
+import com.trekker.domain.project.dto.res.ProjectResDto;
 import com.trekker.domain.project.entity.Project;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,27 @@ public class ProjectService {
         return saveProject.getId();
     }
 
+    /**
+     * 사용자의 프로젝트 리스트를 반환하는 메서드.
+     *
+     * 회원 정보를 조회하고, 회원이 소유한 프로젝트 리스트를 가져와 진행률과 함께 반환합니다.
+     *
+     * @param email 사용자의 이메일
+     * @param type 프로젝트 유형 ("개인" 또는 "팀"으로 필터링)
+     * @return 사용자의 프로젝트 정보 및 진행률을 포함한 DTO 리스트
+     * @throws BusinessException 회원 정보가 존재하지 않을 경우 예외를 발생
+     */
+
+    public List<ProjectResDto> getProjectList(String email, String type) {
+        // 회원과 프로젝트 리스트 조회 및 검증
+        Member member = memberRepository.findMemberByEmailWithProjectList(email, type).orElseThrow(
+                () -> new BusinessException(email, "email", ErrorCode.MEMBER_NOT_FOUND)
+        );
+        // 프로젝트 진행률 계산 후 DTO로 변환
+        return member.getProjectList().stream()
+                .map(ProjectResDto::toDto)
+                .collect(Collectors.toList());
+    }
     @Transactional
     public void updateProject(String email, Long projectId, ProjectReqDto projectReqDto) {
         // 회원 및 프로젝트 조회 및 검증

@@ -3,7 +3,7 @@ package com.trekker.domain.project.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import com.trekker.domain.member.entity.Member;
-import com.trekker.domain.project.dto.ProjectReqDto;
+import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.global.entity.BaseEntity;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;

@@ -27,4 +27,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             """)
     Optional<Member> findByProviderAndProviderId(@Param("provider") String provider,
             @Param("providerId") String providerId);
+    @Query("""
+           SELECT m
+           FROM Member m
+           LEFT JOIN FETCH m.projectList p
+           WHERE m.email = :email
+           AND (p IS NULL OR (p.isCompleted = false AND (:type IS NULL OR p.type = :type)))
+           """)
+    Optional<Member> findMemberByEmailWithProjectList(@Param("email") String email, @Param("type") String type);
 }

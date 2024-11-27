@@ -8,14 +8,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    Optional<Member> findMemberByEmail(String email);
     @Query("""
-            SELECT m 
+            SELECT m
             FROM Member m 
             JOIN FETCH m.socialProvider s 
             JOIN FETCH m.onboarding o
             WHERE m.email =:email 
             """)
-    Optional<Member> findByEmail(@Param("email") String email);
+    Optional<Member> findByEmailWithSocialAndOnboarding(@Param("email") String email);
 
     @Query("""
             SELECT m 

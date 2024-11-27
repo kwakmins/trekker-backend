@@ -113,14 +113,14 @@ class AuthServiceTest {
                 .socialProvider(mock(SocialProvider.class))
                 .build();
 
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(memberRepository.findByEmailWithSocialAndOnboarding(email)).thenReturn(Optional.of(member));
 
         // when
         authService.deleteAccount(email);
 
         // then
         verify(unlinkService, times(1)).unlink(member);
-        verify(memberRepository, times(1)).findByEmail(email);
+        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(email);
         assertThat(member.isDelete()).isTrue();
     }
 
@@ -130,13 +130,13 @@ class AuthServiceTest {
         // given
         String nonExistentEmail = "notexist@example.com";
 
-        when(memberRepository.findByEmail(nonExistentEmail)).thenReturn(Optional.empty());
+        when(memberRepository.findByEmailWithSocialAndOnboarding(nonExistentEmail)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> authService.deleteAccount(nonExistentEmail))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-        verify(memberRepository, times(1)).findByEmail(nonExistentEmail);
+        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(nonExistentEmail);
         verify(unlinkService, never()).unlink(any(Member.class));
     }
 }

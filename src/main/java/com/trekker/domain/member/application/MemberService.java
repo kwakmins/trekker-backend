@@ -30,7 +30,7 @@ public class MemberService {
         Boolean isCompleted = member.getOnboarding().getIsCompleted();
         if (isCompleted) {
             throw new BusinessException(isCompleted, "isCompleted",
-                    ErrorCode.ONBOARDING_ALREADY_COMPLETED);
+                    ErrorCode.MEMBER_ONBOARDING_ALREADY_COMPLETED);
         }
         member.updateOnboarding(onboardingReqDto);
     }

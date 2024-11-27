@@ -88,8 +88,8 @@ public class Member extends BaseEntity {
         this.name = onboardingReqDto.name();
         this.job = job;
 
-        if (onboardingReqDto.projectAddDto() != null) {
-            Project project = onboardingReqDto.projectAddDto().toEntity(this);
+        if (onboardingReqDto.projectReqDto() != null) {
+            Project project = onboardingReqDto.projectReqDto().toEntity(this);
             this.projectList.add(project);
         }
         onboarding.updateCompleted();

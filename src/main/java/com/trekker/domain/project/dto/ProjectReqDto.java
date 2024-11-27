@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
-public record ProjectAddReqDto(
+public record ProjectReqDto(
         @NotNull
         @Size(max = 20, message = "제목은 최대 20 자까지 입력 가능합니다.")
         String title,

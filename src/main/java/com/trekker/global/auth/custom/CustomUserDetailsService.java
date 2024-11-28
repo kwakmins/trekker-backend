@@ -46,7 +46,7 @@ public class CustomUserDetailsService extends DefaultOAuth2UserService {
 
     private CustomUserDetails createUserDetails(Member member, Map<String, Object> attributes) {
         return CustomUserDetails.builder()
-                .email(member.getEmail())
+                .id(String.valueOf(member.getId()))
                 .isCompleted(member.getOnboarding().getIsCompleted())
                 .authorities(Collections.singleton(
                         new SimpleGrantedAuthority("ROLE_" + member.getRole().toString())))

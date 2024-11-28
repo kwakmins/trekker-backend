@@ -34,12 +34,12 @@ class ProjectServiceTest {
     @Mock
     private MemberRepository memberRepository;
     private Member mockMember;
-    private static final String email = "test@example.com";
+    private static final Long memberId =1L;
 
     @BeforeEach
     void setUp() {
         mockMember = Member.builder()
-                .email(email)
+                .id(memberId)
                 .build();
     }
 
@@ -56,10 +56,10 @@ class ProjectServiceTest {
                 .build();
 
         when(projectRepository.save(any())).thenReturn(saveProject);
-        when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         //when
-        Long projectId = projectService.addProject(email, mockDto);
+        Long projectId = projectService.addProject(memberId, mockDto);
 
         //then
         assertThat(projectId).isEqualTo(saveProject.getId());
@@ -77,10 +77,10 @@ class ProjectServiceTest {
                 "개인"
         );
 
-        when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when & then
-        assertThatThrownBy(() -> projectService.addProject(email, invalidReqDto))
+        assertThatThrownBy(() -> projectService.addProject(memberId, invalidReqDto))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.PROJECT_BAD_REQUEST.getMessage());
     }
@@ -103,11 +103,11 @@ class ProjectServiceTest {
                 .projectList(projects)
                 .build();
 
-        when(memberRepository.findMemberByEmailWithProjectList(email, "개인")).thenReturn(
+        when(memberRepository.findMemberByEmailWithProjectList(memberId, "개인")).thenReturn(
                 Optional.of(mockMember));
 
         // when
-        ProjectWithMemberInfoResDto resDto = projectService.getProjectList(email, "개인");
+        ProjectWithMemberInfoResDto resDto = projectService.getProjectList(memberId, "개인");
 
         // then
         assertThat(resDto.projectList().size()).isEqualTo(1);
@@ -135,10 +135,10 @@ class ProjectServiceTest {
 
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
                 Optional.of(project));
-        when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         //when
-        projectService.updateProject(email, project.getId(), reqDto);
+        projectService.updateProject(memberId, project.getId(), reqDto);
 
         //then
         assertThat(project.getTitle()).isEqualTo(reqDto.title());
@@ -155,10 +155,10 @@ class ProjectServiceTest {
 
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
                 Optional.of(project));
-        when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when
-        projectService.deleteProject(email, project.getId());
+        projectService.deleteProject(memberId, project.getId());
 
         // then
         verify(projectRepository, times(1)).delete(project);
@@ -172,10 +172,10 @@ class ProjectServiceTest {
         Long projectId = 1L;
 
         when(projectRepository.findProjectByIdWIthMember(projectId)).thenReturn(Optional.empty());
-        when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when & then
-        assertThatThrownBy(() -> projectService.deleteProject(email, projectId))
+        assertThatThrownBy(() -> projectService.deleteProject(memberId, projectId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.PROJECT_NOT_FOUND.getMessage());
     }
@@ -194,12 +194,12 @@ class ProjectServiceTest {
                 .startDate(LocalDate.now())
                 .build();
 
-        when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
                 Optional.of(project));
 
         // when & then
-        assertThatThrownBy(() -> projectService.deleteProject(email, project.getId()))
+        assertThatThrownBy(() -> projectService.deleteProject(memberId, project.getId()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.ACCESS_DENIED_EXCEPTION.getMessage());
     }

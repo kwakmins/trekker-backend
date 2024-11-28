@@ -19,14 +19,14 @@ public class MemberService {
     /**
      * 온보딩 데이터를 업데이트 합니다.
      *
-     * @param email            사용자의 이메일
+     * @param memberId            사용자의 id
      * @param onboardingReqDto 사용자의 이름, 직무명, 프로젝트 정보가 포함되어 있음
      */
     @Transactional
-    public void updateOnboarding(String email, OnboardingReqDto onboardingReqDto) {
-        Member member = memberRepository.findByEmailWithSocialAndOnboarding(email)
+    public void updateOnboarding(Long memberId, OnboardingReqDto onboardingReqDto) {
+        Member member = memberRepository.findByEmailWithSocialAndOnboarding(memberId)
                 .orElseThrow(
-                        () -> new BusinessException(email, "email", ErrorCode.MEMBER_NOT_FOUND));
+                        () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND));
         Boolean isCompleted = member.getOnboarding().getIsCompleted();
         if (isCompleted) {
             throw new BusinessException(isCompleted, "isCompleted",

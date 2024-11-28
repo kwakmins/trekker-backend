@@ -24,9 +24,9 @@ public class ProjectService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long addProject(String email, ProjectReqDto projectReqDto) {
+    public Long addProject(Long memberId, ProjectReqDto projectReqDto) {
         // 회원 조회 및 검증
-        Member member = findMemberByEmail(email);
+        Member member = findMemberByEmail(memberId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
         validateProjectDates(projectReqDto);
@@ -43,16 +43,16 @@ public class ProjectService {
      * 사용자의 프로젝트 리스트를 반환하는 메서드.
      * 회원 정보를 조회하고, 회원이 소유한 프로젝트 리스트를 가져와 진행률과 함께 반환합니다.
      *
-     * @param email 사용자의 이메일
+     * @param memberId 사용자의 id
      * @param type  프로젝트 유형 ("개인" 또는 "팀"으로 필터링)
      * @return 사용자 정보(이름,직군), 프로젝트 정보 및 진행률을 포함한 DTO 리스트
      * @throws BusinessException 회원 정보가 존재하지 않을 경우 예외를 발생
      */
 
-    public ProjectWithMemberInfoResDto getProjectList(String email, String type) {
+    public ProjectWithMemberInfoResDto getProjectList(Long memberId, String type) {
         // 회원과 프로젝트 리스트 조회 및 검증
-        Member member = memberRepository.findMemberByEmailWithProjectList(email, type).orElseThrow(
-                () -> new BusinessException(email, "email", ErrorCode.MEMBER_NOT_FOUND)
+        Member member = memberRepository.findMemberByEmailWithProjectList(memberId, type).orElseThrow(
+                () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)
         );
         // 프로젝트 진행률 계산 후 DTO로 변환
         List<ProjectResDto> projectList = member.getProjectList().stream()
@@ -63,9 +63,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public void updateProject(String email, Long projectId, ProjectReqDto projectReqDto) {
+    public void updateProject(Long memberId, Long projectId, ProjectReqDto projectReqDto) {
         // 회원 및 프로젝트 조회 및 검증
-        Member member = findMemberByEmail(email);
+        Member member = findMemberByEmail(memberId);
         Project project = findProjectByIdWithMember(projectId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
@@ -79,9 +79,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteProject(String email, Long projectId) {
+    public void deleteProject(Long memberId, Long projectId) {
         // 회원 및 프로젝트 조회 및 검증
-        Member member = findMemberByEmail(email);
+        Member member = findMemberByEmail(memberId);
         Project project = findProjectByIdWithMember(projectId);
 
         // 회원이 프로젝트 소유자인지 검증
@@ -94,13 +94,13 @@ public class ProjectService {
     /**
      * 이메일로 회원을 조회하고 없으면 예외를 발생시킵니다.
      *
-     * @param email 조회할 회원의 이메일
+     * @param memberId 조회할 회원의 Id
      * @return Member
      */
-    private Member findMemberByEmail(String email) {
-        return memberRepository.findMemberByEmail(email)
+    private Member findMemberByEmail(Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(
-                        () -> new BusinessException(email, "email", ErrorCode.MEMBER_NOT_FOUND)
+                        () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)
                 );
     }
 

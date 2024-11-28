@@ -45,7 +45,7 @@ public class UnlinkService {
                     unlinkKakao(socialProvider.getProviderId());
                     break;
                 case "google":
-                    unlinkGoogle(member.getEmail());
+                    unlinkGoogle(String.valueOf(member.getId()));
                     break;
                 default:
                     throw new BusinessException(ErrorCode.UNSUPPORTED_SOCIAL_PROVIDER);
@@ -85,21 +85,21 @@ public class UnlinkService {
     /**
      * 구글 연결 해제
      *
-     * @param email 사용자 이메일
+     * @param memberId 사용자 Id
      */
-    private void unlinkGoogle(String email) {
-        String refreshToken = redisRepository.fetchAndDeleteSocialRefreshToken(email);
+    private void unlinkGoogle(String memberId) {
+        String refreshToken = redisRepository.fetchAndDeleteSocialRefreshToken(memberId);
 
         if (refreshToken == null) {
             log.error("구글 연결 끊기 실패: Refresh Token이 없습니다.");
-            throw new BusinessException(email, "refreshToken", ErrorCode.SOCIAL_UNLINK_FAILED);
+            throw new BusinessException(memberId, "refreshToken", ErrorCode.SOCIAL_UNLINK_FAILED);
         }
 
         String url = GOOGLE_UNLINK_URL + "?token=" + refreshToken;
 
         try {
             restTemplate.postForEntity(url, null, String.class);
-            log.info("구글 연결 끊기 성공: 사용자 이메일 = {}", email);
+            log.info("구글 연결 끊기 성공: 사용자 ID = {}", memberId);
         } catch (Exception e) {
             log.error("구글 연결 끊기 실패: Refresh Token = {}", refreshToken, e);
             throw new BusinessException(refreshToken, "refreshToken",

@@ -45,7 +45,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // Redis에 authResponse 저장 및 임시 토큰 발급
         String tempToken = redisRepository.storeAuthResponseWithTempToken(authResponse);
-        String account = oAuth2User.getEmail();
+        String account = oAuth2User.getId();
 
         // 제공자가 google일 경우, 추후 회원 탈퇴를 위한 리프래시 토큰 저장
         handleGoogleRefreshToken(authToken, account);

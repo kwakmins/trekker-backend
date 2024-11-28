@@ -21,9 +21,9 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/onboarding")
-    public ResponseEntity<Void> onBoarding(@LoginMember String email,
+    public ResponseEntity<Void> onBoarding(@LoginMember Long id,
             @Valid @RequestBody OnboardingReqDto onboardingReqDto) {
-        memberService.updateOnboarding(email, onboardingReqDto);
+        memberService.updateOnboarding(id, onboardingReqDto);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 }

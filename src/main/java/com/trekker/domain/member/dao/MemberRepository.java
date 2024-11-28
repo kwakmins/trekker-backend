@@ -8,15 +8,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findMemberByEmail(String email);
     @Query("""
             SELECT m
             FROM Member m 
             JOIN FETCH m.socialProvider s 
             JOIN FETCH m.onboarding o
-            WHERE m.email =:email 
+            WHERE m.id =:memberId 
             """)
-    Optional<Member> findByEmailWithSocialAndOnboarding(@Param("email") String email);
+    Optional<Member> findByEmailWithSocialAndOnboarding(@Param("memberId") Long memberId);
 
     @Query("""
             SELECT m 
@@ -32,8 +31,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            FROM Member m
            JOIN FETCH m.job
            LEFT JOIN FETCH m.projectList p
-           WHERE m.email = :email
+           WHERE m.id = :memberId
            AND (p IS NULL OR (p.isCompleted = false AND (:type IS NULL OR p.type = :type)))
            """)
-    Optional<Member> findMemberByEmailWithProjectList(@Param("email") String email, @Param("type") String type);
+    Optional<Member> findMemberByEmailWithProjectList(@Param("memberId") Long memberId, @Param("type") String type);
 }

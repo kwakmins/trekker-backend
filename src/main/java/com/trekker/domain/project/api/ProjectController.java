@@ -29,19 +29,19 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<Long> addProject(
-            @LoginMember String email,
+            @LoginMember Long memberId,
             @Valid @RequestBody ProjectReqDto projectReqDto
     ) {
-        Long projectId = projectService.addProject(email, projectReqDto);
+        Long projectId = projectService.addProject(memberId, projectReqDto);
 
         return ResponseEntity.status(CREATED).body(projectId);
     }
     @GetMapping
     public ResponseEntity<ProjectWithMemberInfoResDto> getProjectList(
-            @LoginMember String email,
+            @LoginMember Long memberId,
             @RequestParam(required = false) String type
     ) {
-        ProjectWithMemberInfoResDto resDto = projectService.getProjectList(email, type);
+        ProjectWithMemberInfoResDto resDto = projectService.getProjectList(memberId, type);
 
         return ResponseEntity.ok(resDto);
     }
@@ -49,21 +49,21 @@ public class ProjectController {
 
     @PutMapping("/{projectId}")
     public ResponseEntity<Void> updateProject(
-            @LoginMember String email,
+            @LoginMember Long memberId,
             @PathVariable(name = "projectId") Long projectId,
             @Valid @RequestBody ProjectReqDto projectReqDto
     ) {
-        projectService.updateProject(email, projectId, projectReqDto);
+        projectService.updateProject(memberId, projectId, projectReqDto);
 
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(
-            @LoginMember String email,
+            @LoginMember Long memberId,
             @PathVariable(name = "projectId") Long projectId
             ) {
-        projectService.deleteProject(email, projectId);
+        projectService.deleteProject(memberId, projectId);
 
         return ResponseEntity.status(NO_CONTENT).build();
     }

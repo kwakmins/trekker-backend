@@ -12,7 +12,7 @@ import java.util.Map;
 @Builder
 public class CustomUserDetails implements OAuth2User {
 
-    private String email;
+    private String id;
     // 온보딩 완료 여부
     private boolean isCompleted;
     private Collection<? extends GrantedAuthority> authorities;
@@ -20,7 +20,7 @@ public class CustomUserDetails implements OAuth2User {
 
     @Override
     public String getName() {
-        return email;
+        return id;
     }
 
     /**

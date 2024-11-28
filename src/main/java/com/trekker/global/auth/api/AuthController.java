@@ -31,9 +31,9 @@ public class AuthController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAccount(
-            @LoginMember String email
+            @LoginMember Long id
     ) {
-        authService.deleteAccount(email);
+        authService.deleteAccount(id);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
@@ -64,6 +64,7 @@ public class AuthController {
             @NotNull @RequestParam("tempToken") String tempToken
     ) {
         AuthResDto authResponse = authService.retrieveAuthResponse(tempToken);
+
         return ResponseEntity.ok(authResponse);
     }
 

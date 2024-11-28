@@ -107,20 +107,20 @@ class AuthServiceTest {
     @Test
     void deleteAccount() {
         // given
-        String email = "test@example.com";
+        Long id = 1L;
         Member member = Member.builder()
-                .email(email)
+                .id(1L)
                 .socialProvider(mock(SocialProvider.class))
                 .build();
 
-        when(memberRepository.findByEmailWithSocialAndOnboarding(email)).thenReturn(Optional.of(member));
+        when(memberRepository.findByEmailWithSocialAndOnboarding(id)).thenReturn(Optional.of(member));
 
         // when
-        authService.deleteAccount(email);
+        authService.deleteAccount(id);
 
         // then
         verify(unlinkService, times(1)).unlink(member);
-        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(email);
+        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(id);
         assertThat(member.isDelete()).isTrue();
     }
 
@@ -128,15 +128,15 @@ class AuthServiceTest {
     @Test
     void failToDeleteAccountWhenMemberNotFound() {
         // given
-        String nonExistentEmail = "notexist@example.com";
+        Long nonExistentId = 3L;
 
-        when(memberRepository.findByEmailWithSocialAndOnboarding(nonExistentEmail)).thenReturn(Optional.empty());
+        when(memberRepository.findByEmailWithSocialAndOnboarding(nonExistentId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> authService.deleteAccount(nonExistentEmail))
+        assertThatThrownBy(() -> authService.deleteAccount(nonExistentId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(nonExistentEmail);
+        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(nonExistentId);
         verify(unlinkService, never()).unlink(any(Member.class));
     }
 }

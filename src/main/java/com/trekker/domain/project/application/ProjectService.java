@@ -7,8 +7,10 @@ import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.domain.project.dto.res.ProjectResDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
 import com.trekker.domain.project.entity.Project;
+import com.trekker.domain.project.util.ProjectProgressCalculator;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -54,10 +56,20 @@ public class ProjectService {
         Member member = memberRepository.findByIdWithJob(memberId).orElseThrow(
                 () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)
         );
-        // 프로젝트 진행률 계산 후 DTO로 변환
+
+        // 프로젝트 리스트 조회 및 진행률 계산 후 DTO 변환
         List<ProjectResDto> projectList = projectRepository.findFilteredProjects(memberId, type)
                 .stream()
-                .map(ProjectResDto::toDto)
+                .map(project -> {
+                    // 진행률 계산
+                    int progress = ProjectProgressCalculator.calculateProjectProgress(
+                            project.getStartDate(),
+                            project.getEndDate(),
+                            LocalDate.now()
+                    );
+                    // DTO로 변환
+                    return ProjectResDto.toDto(project, progress);
+                })
                 .collect(Collectors.toList());
 
         return ProjectWithMemberInfoResDto.toDto(member, projectList);

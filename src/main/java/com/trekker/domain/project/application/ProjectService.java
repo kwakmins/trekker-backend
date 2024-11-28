@@ -51,11 +51,12 @@ public class ProjectService {
 
     public ProjectWithMemberInfoResDto getProjectList(Long memberId, String type) {
         // 회원과 프로젝트 리스트 조회 및 검증
-        Member member = memberRepository.findByIdWithProjectList(memberId, type).orElseThrow(
+        Member member = memberRepository.findByIdWithJob(memberId).orElseThrow(
                 () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)
         );
         // 프로젝트 진행률 계산 후 DTO로 변환
-        List<ProjectResDto> projectList = member.getProjectList().stream()
+        List<ProjectResDto> projectList = projectRepository.findFilteredProjects(memberId, type)
+                .stream()
                 .map(ProjectResDto::toDto)
                 .collect(Collectors.toList());
 

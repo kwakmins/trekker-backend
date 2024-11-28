@@ -29,7 +29,7 @@ public class TokenProvider {
 
     private final Key key;
     private final RedisRepository redisRepository;
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000; // 30분
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 30; // 30분
     private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7일
 
     @Autowired

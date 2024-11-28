@@ -27,12 +27,18 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByProviderAndProviderId(@Param("provider") String provider,
             @Param("providerId") String providerId);
     @Query("""
+           SELECT  m
+           FROM Member m
+           JOIN FETCH m.job
+           JOIN FETCH m.projectList p
+           WHERE m.id = :memberId
+           """)
+    Optional<Member> findByIdWithProjectList(@Param("memberId") Long memberId);
+    @Query("""
            SELECT m
            FROM Member m
            JOIN FETCH m.job
-           LEFT JOIN FETCH m.projectList p
-           WHERE m.id = :memberId
-           AND (p IS NULL OR (p.isCompleted = false AND (:type IS NULL OR p.type = :type)))
+           WHERE m.id =:memberId
            """)
-    Optional<Member> findByIdWithProjectList(@Param("memberId") Long memberId, @Param("type") String type);
+    Optional<Member> findByIdWithJob(@Param("memberId") Long memberId);
 }

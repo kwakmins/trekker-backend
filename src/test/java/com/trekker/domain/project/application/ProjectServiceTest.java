@@ -103,8 +103,9 @@ class ProjectServiceTest {
                 .projectList(projects)
                 .build();
 
-        when(memberRepository.findByIdWithProjectList(memberId, "개인")).thenReturn(
+        when(memberRepository.findByIdWithJob(memberId)).thenReturn(
                 Optional.of(mockMember));
+        when(projectRepository.findFilteredProjects(memberId, "개인")).thenReturn(projects);
 
         // when
         ProjectWithMemberInfoResDto resDto = projectService.getProjectList(memberId, "개인");

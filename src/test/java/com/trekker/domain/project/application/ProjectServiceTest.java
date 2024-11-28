@@ -103,7 +103,7 @@ class ProjectServiceTest {
                 .projectList(projects)
                 .build();
 
-        when(memberRepository.findMemberByEmailWithProjectList(memberId, "개인")).thenReturn(
+        when(memberRepository.findByIdWithProjectList(memberId, "개인")).thenReturn(
                 Optional.of(mockMember));
 
         // when
@@ -135,7 +135,6 @@ class ProjectServiceTest {
 
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
                 Optional.of(project));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         //when
         projectService.updateProject(memberId, project.getId(), reqDto);
@@ -155,7 +154,6 @@ class ProjectServiceTest {
 
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
                 Optional.of(project));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when
         projectService.deleteProject(memberId, project.getId());
@@ -172,7 +170,6 @@ class ProjectServiceTest {
         Long projectId = 1L;
 
         when(projectRepository.findProjectByIdWIthMember(projectId)).thenReturn(Optional.empty());
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when & then
         assertThatThrownBy(() -> projectService.deleteProject(memberId, projectId))
@@ -185,6 +182,7 @@ class ProjectServiceTest {
     void deleteProjectFailUserIsNotOwner() {
         // given
         Member otherMember = Member.builder()
+                .id(2L)
                 .email("otherUser@example.com")
                 .build();
         Project project = Project.builder()
@@ -194,7 +192,6 @@ class ProjectServiceTest {
                 .startDate(LocalDate.now())
                 .build();
 
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
                 Optional.of(project));
 

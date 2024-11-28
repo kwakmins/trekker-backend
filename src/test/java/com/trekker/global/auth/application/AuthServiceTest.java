@@ -113,14 +113,14 @@ class AuthServiceTest {
                 .socialProvider(mock(SocialProvider.class))
                 .build();
 
-        when(memberRepository.findByEmailWithSocialAndOnboarding(id)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdWithSocialAndOnboarding(id)).thenReturn(Optional.of(member));
 
         // when
         authService.deleteAccount(id);
 
         // then
         verify(unlinkService, times(1)).unlink(member);
-        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(id);
+        verify(memberRepository, times(1)).findByIdWithSocialAndOnboarding(id);
         assertThat(member.isDelete()).isTrue();
     }
 
@@ -130,13 +130,13 @@ class AuthServiceTest {
         // given
         Long nonExistentId = 3L;
 
-        when(memberRepository.findByEmailWithSocialAndOnboarding(nonExistentId)).thenReturn(Optional.empty());
+        when(memberRepository.findByIdWithSocialAndOnboarding(nonExistentId)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> authService.deleteAccount(nonExistentId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-        verify(memberRepository, times(1)).findByEmailWithSocialAndOnboarding(nonExistentId);
+        verify(memberRepository, times(1)).findByIdWithSocialAndOnboarding(nonExistentId);
         verify(unlinkService, never()).unlink(any(Member.class));
     }
 }

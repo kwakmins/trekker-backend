@@ -65,9 +65,9 @@ public class Project extends BaseEntity {
         this.isCompleted = isCompleted;
         this.member = member;
     }
-    public void validateOwner(Member member) {
-        if (!this.member.equals(member)) {
-            throw new BusinessException(member.getEmail(), "email", ErrorCode.ACCESS_DENIED_EXCEPTION);
+    public void validateOwner(Long memberId) {
+        if (!this.member.getId().equals(memberId)) {
+            throw new BusinessException(member.getId(), "id", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
     }
 

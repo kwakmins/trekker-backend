@@ -24,7 +24,7 @@ public class MemberService {
      */
     @Transactional
     public void updateOnboarding(Long memberId, OnboardingReqDto onboardingReqDto) {
-        Member member = memberRepository.findByEmailWithSocialAndOnboarding(memberId)
+        Member member = memberRepository.findByIdWithSocialAndOnboarding(memberId)
                 .orElseThrow(
                         () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND));
         Boolean isCompleted = member.getOnboarding().getIsCompleted();

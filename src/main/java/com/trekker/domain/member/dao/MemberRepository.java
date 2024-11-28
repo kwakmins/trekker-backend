@@ -15,7 +15,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             JOIN FETCH m.onboarding o
             WHERE m.id =:memberId 
             """)
-    Optional<Member> findByEmailWithSocialAndOnboarding(@Param("memberId") Long memberId);
+    Optional<Member> findByIdWithSocialAndOnboarding(@Param("memberId") Long memberId);
 
     @Query("""
             SELECT m 
@@ -34,5 +34,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            WHERE m.id = :memberId
            AND (p IS NULL OR (p.isCompleted = false AND (:type IS NULL OR p.type = :type)))
            """)
-    Optional<Member> findMemberByEmailWithProjectList(@Param("memberId") Long memberId, @Param("type") String type);
+    Optional<Member> findByIdWithProjectList(@Param("memberId") Long memberId, @Param("type") String type);
 }

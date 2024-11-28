@@ -26,7 +26,7 @@ public class ProjectService {
     @Transactional
     public Long addProject(Long memberId, ProjectReqDto projectReqDto) {
         // 회원 조회 및 검증
-        Member member = findMemberByEmail(memberId);
+        Member member = findById(memberId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
         validateProjectDates(projectReqDto);
@@ -51,7 +51,7 @@ public class ProjectService {
 
     public ProjectWithMemberInfoResDto getProjectList(Long memberId, String type) {
         // 회원과 프로젝트 리스트 조회 및 검증
-        Member member = memberRepository.findMemberByEmailWithProjectList(memberId, type).orElseThrow(
+        Member member = memberRepository.findByIdWithProjectList(memberId, type).orElseThrow(
                 () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)
         );
         // 프로젝트 진행률 계산 후 DTO로 변환
@@ -65,14 +65,13 @@ public class ProjectService {
     @Transactional
     public void updateProject(Long memberId, Long projectId, ProjectReqDto projectReqDto) {
         // 회원 및 프로젝트 조회 및 검증
-        Member member = findMemberByEmail(memberId);
         Project project = findProjectByIdWithMember(projectId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
         validateProjectDates(projectReqDto);
 
         // 회원이 프로젝트 소유자인지 검증
-        project.validateOwner(member);
+        project.validateOwner(memberId);
 
         // 프로젝트 업데이트
         project.updateProject(projectReqDto);
@@ -81,11 +80,10 @@ public class ProjectService {
     @Transactional
     public void deleteProject(Long memberId, Long projectId) {
         // 회원 및 프로젝트 조회 및 검증
-        Member member = findMemberByEmail(memberId);
         Project project = findProjectByIdWithMember(projectId);
 
         // 회원이 프로젝트 소유자인지 검증
-        project.validateOwner(member);
+        project.validateOwner(memberId);
 
         // 프로젝트 삭제
         projectRepository.delete(project);
@@ -97,7 +95,7 @@ public class ProjectService {
      * @param memberId 조회할 회원의 Id
      * @return Member
      */
-    private Member findMemberByEmail(Long memberId) {
+    private Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(
                         () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)

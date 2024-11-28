@@ -82,7 +82,7 @@ public class AuthService {
      */
     @Transactional
     public void deleteAccount(Long memberId) {
-        Member member = memberRepository.findByEmailWithSocialAndOnboarding(memberId)
+        Member member = memberRepository.findByIdWithSocialAndOnboarding(memberId)
                 .orElseThrow(
                         () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND));
 

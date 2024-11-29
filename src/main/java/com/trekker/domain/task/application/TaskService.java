@@ -35,7 +35,7 @@ public class TaskService {
         project.validateOwner(memberId);
 
         // 할 일 날짜 검증
-        validateDates(project, taskReqDto.startDate(), taskReqDto.endDate());
+        validateTaskDatesWithinProject(project, taskReqDto.startDate(), taskReqDto.endDate());
 
 
         // Entity로 변환
@@ -51,9 +51,9 @@ public class TaskService {
      * @param projectId 조회할 프로젝트의 Id.
      * @param reqDate   기준 날짜
      * @return ProjectWithTaskInfoResDto - 프로젝트 정보와 함께 기준 날짜의 태스크 목록, ±3일 내 완료 상태를 포함.
-     **/
+     */
     public ProjectWithTaskInfoResDto getTaskList(Long memberId, Long projectId, LocalDate reqDate) {
-        // 프로젝트 정보 조회
+        // 프로젝트 정보 조회 및 사용자 검증
         Project project = findProjectByIdWithMember(projectId);
         project.validateOwner(memberId);
 
@@ -62,28 +62,17 @@ public class TaskService {
         LocalDate endDate = reqDate.plusDays(TASK_RANGE_DAYS);
 
         // 태스크 데이터 조회
-        List<Task> tasksInRange = taskRepository.findTasksWithinDateRange(projectId, startDate,
-                endDate);
+        List<Task> tasksInRange = taskRepository.findTasksWithinDateRange(projectId, startDate, endDate);
 
-        // 선택한 날짜의 태스크 필터링
-        List<TaskResDto> tasksOnReqDate = tasksInRange.stream()
-                .filter(task -> TaskFilter.isDateWithinRange(reqDate, task.getStartDate(),
-                        task.getEndDate()))
-                .map(TaskResDto::toDto)
-                .collect(Collectors.toList());
-
-        // 날짜별 완료 여부 계산
-        List<TaskCompletionStatusResDto> weeklyAchievement = startDate.datesUntil(
-                        endDate.plusDays(1))
-                .map(date -> {
-                    boolean isCompleted = TaskFilter.isTaskCompletedOnDate(tasksInRange, date);
-                    return new TaskCompletionStatusResDto(date, isCompleted);
-                })
-                .collect(Collectors.toList());
+        // reqDate 에 해당하는 태스크 목록을 필터링.
+        List<TaskResDto> tasksOnReqDate = getTasksOnReqDate(tasksInRange, reqDate);
+        // 주어진 범위(startDate ~ endDate) 내 날짜별 태스크 완료 상태를 필터링
+        List<TaskCompletionStatusResDto> weeklyAchievement = getWeeklyAchievement(tasksInRange, startDate, endDate);
 
         // DTO 생성 및 반환
         return ProjectWithTaskInfoResDto.toDto(project, weeklyAchievement, tasksOnReqDate);
     }
+
 
     @Transactional
     public void updateTask(Long memberId, Long taskId, TaskReqDto taskReqDto) {
@@ -92,7 +81,7 @@ public class TaskService {
         task.getProject().validateOwner(memberId);
 
         // 할 일 날짜 검증
-        validateDates(task.getProject(), taskReqDto.startDate(), taskReqDto.endDate());
+        validateTaskDatesWithinProject(task.getProject(), taskReqDto.startDate(), taskReqDto.endDate());
 
         // 할 일 업데이트
         task.updateTask(taskReqDto);
@@ -135,6 +124,36 @@ public class TaskService {
                         () -> new BusinessException(taskId, "taskId", ErrorCode.TASK_NOT_FOUND)
                 );
     }
+    /**
+     * 특정 날짜(reqDate)에 해당하는 태스크 목록을 필터링하여 반환합니다.
+     *
+     * @param tasksInRange 태스크 목록 (범위 내의 태스크)
+     * @param reqDate      기준 날짜
+     * @return 기준 날짜의 태스크 DTO 목록
+     */
+    private List<TaskResDto> getTasksOnReqDate(List<Task> tasksInRange, LocalDate reqDate) {
+        return tasksInRange.stream()
+                .filter(task -> TaskFilter.isDateWithinRange(reqDate, task.getStartDate(), task.getEndDate()))
+                .map(TaskResDto::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 주어진 범위(startDate ~ endDate) 내 날짜별 태스크 완료 상태를 계산하여 반환합니다.
+     *
+     * @param tasksInRange 태스크 목록 (범위 내의 태스크)
+     * @param startDate    시작 날짜
+     * @param endDate      종료 날짜
+     * @return 날짜별 완료 상태 DTO 목록
+     */
+    private List<TaskCompletionStatusResDto> getWeeklyAchievement(List<Task> tasksInRange, LocalDate startDate, LocalDate endDate) {
+        return startDate.datesUntil(endDate.plusDays(1))
+                .map(date -> {
+                    boolean isCompleted = TaskFilter.isTaskCompletedOnDate(tasksInRange, date);
+                    return new TaskCompletionStatusResDto(date, isCompleted);
+                })
+                .collect(Collectors.toList());
+    }
 
 
     /**
@@ -145,7 +164,7 @@ public class TaskService {
      * @param endDate   작업의 종료일 (nullable)
      * @throws BusinessException 시작일 또는 종료일이 조건을 만족하지 않을 경우 예외를 발생시킵니다.
      */
-    private void validateDates(Project project, LocalDate startDate, LocalDate endDate) {
+    void validateTaskDatesWithinProject(Project project, LocalDate startDate, LocalDate endDate) {
         // startDate 검증: 작업 시작일이 프로젝트 시작일보다 빠른 경우 예외 발생
         if (project.getStartDate().isAfter(startDate)) {
             throw new BusinessException(startDate, "startDate", ErrorCode.TASK_BAD_REQUEST);
@@ -163,5 +182,6 @@ public class TaskService {
             }
         }
     }
+
 
 }

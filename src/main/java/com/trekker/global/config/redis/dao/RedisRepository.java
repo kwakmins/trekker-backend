@@ -20,7 +20,7 @@ public class RedisRepository {
     private final RedisTemplate<String, Object> redisTemplate;
     private static final int TEMP_TOKEN_EXPIRATION = 300;
     private static final int SOCIAL_REFRESH_TOKEN_EXPIRATION = 3650;
-    private static final String SOCIAL_TOKEN_REDIS_KEY = "social:refreshToken";
+    private static final String SOCIAL_TOKEN_REDIS_KEY = "social:refreshToken_";
 
     /**
      * Refresh 토큰과 사용자 정보를 Redis에 저장

@@ -12,13 +12,15 @@ import java.util.Map;
 @Builder
 public class CustomUserDetails implements OAuth2User {
 
-    private String email;
+    private String id;
+    // 온보딩 완료 여부
+    private boolean isCompleted;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
     @Override
     public String getName() {
-        return email;
+        return id;
     }
 
     /**
@@ -33,6 +35,10 @@ public class CustomUserDetails implements OAuth2User {
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
+    }
+
+    public boolean getIsCompleted() {
+        return this.isCompleted;
     }
 
 }

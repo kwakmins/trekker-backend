@@ -9,19 +9,36 @@ import org.springframework.data.repository.query.Param;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("""
-            SELECT m 
+            SELECT m
             FROM Member m 
             JOIN FETCH m.socialProvider s 
-            WHERE m.email =:email 
+            JOIN FETCH m.onboarding o
+            WHERE m.id =:memberId 
             """)
-    Optional<Member> findByEmail(@Param("email") String email);
+    Optional<Member> findByIdWithSocialAndOnboarding(@Param("memberId") Long memberId);
 
     @Query("""
             SELECT m 
             FROM Member m 
-            JOIN FETCH m.socialProvider s 
+            JOIN FETCH m.socialProvider s
+            JOIN FETCH m.onboarding o
             WHERE s.provider =:provider AND s.providerId =:providerId
             """)
     Optional<Member> findByProviderAndProviderId(@Param("provider") String provider,
             @Param("providerId") String providerId);
+    @Query("""
+           SELECT  m
+           FROM Member m
+           JOIN FETCH m.job
+           JOIN FETCH m.projectList p
+           WHERE m.id = :memberId
+           """)
+    Optional<Member> findByIdWithProjectList(@Param("memberId") Long memberId);
+    @Query("""
+           SELECT m
+           FROM Member m
+           JOIN FETCH m.job
+           WHERE m.id =:memberId
+           """)
+    Optional<Member> findByIdWithJob(@Param("memberId") Long memberId);
 }

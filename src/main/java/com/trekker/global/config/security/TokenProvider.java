@@ -161,7 +161,7 @@ public class TokenProvider {
     public Authentication getAuthentication(String token) {
         // 1. 토큰에서 사용자 정보 추출
         Claims claims = parseClaims(token);
-        String email = claims.getSubject();
+        String id = claims.getSubject();
         String roles = claims.get("roles", String.class);
 
         // 2. 권한 정보 설정
@@ -171,7 +171,7 @@ public class TokenProvider {
 
         // 3. CustomUserDetails 객체 생성
         CustomUserDetails customUserDetails = CustomUserDetails.builder()
-                .email(email)
+                .id(id)
                 .authorities(authorities)
                 .build();
 

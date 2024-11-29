@@ -78,13 +78,13 @@ public class AuthService {
     /**
      * 회원 계정으로 회원을 조회하고, 삭제합니다. 삭제하면서 연결된 소셜 계정과 연결을 끊습니다.
      *
-     * @param email 사용자 계정
+     * @param memberId 사용자 memberId
      */
     @Transactional
-    public void deleteAccount(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public void deleteAccount(Long memberId) {
+        Member member = memberRepository.findByIdWithSocialAndOnboarding(memberId)
                 .orElseThrow(
-                        () -> new BusinessException(email, "email", ErrorCode.MEMBER_NOT_FOUND));
+                        () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND));
 
         // 소셜 언링크 (연결 끊기)
         unlinkService.unlink(member);

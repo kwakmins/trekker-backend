@@ -28,6 +28,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final OAuth2AuthorizedClientService authorizedClientService;
     private static final String TEMP_TOKEN_NAME = "tempToken";
     private static final String USER_ACCOUNT = "account";
+    private static final String IS_COMPLETED = "isCompleted";
 
     @Value("${login.success-url}")
     private String SUCCESS_URL;
@@ -44,7 +45,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // Redis에 authResponse 저장 및 임시 토큰 발급
         String tempToken = redisRepository.storeAuthResponseWithTempToken(authResponse);
-        String account = oAuth2User.getEmail();
+        String account = oAuth2User.getId();
 
         // 제공자가 google일 경우, 추후 회원 탈퇴를 위한 리프래시 토큰 저장
         handleGoogleRefreshToken(authToken, account);
@@ -53,6 +54,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         String redirectUrl = UriComponentsBuilder.fromUriString(SUCCESS_URL)
                 .queryParam(TEMP_TOKEN_NAME, tempToken)
                 .queryParam(USER_ACCOUNT, account)
+                .queryParam(IS_COMPLETED, oAuth2User.getIsCompleted())
                 .build().toUriString();
 
         response.sendRedirect(redirectUrl); // 프론트엔드로 리다이렉트
@@ -88,4 +90,3 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         return null;
     }
 }
-

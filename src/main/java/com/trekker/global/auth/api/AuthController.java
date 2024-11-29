@@ -10,13 +10,12 @@ import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-@Controller
+@RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -32,9 +31,9 @@ public class AuthController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAccount(
-            @LoginMember String email
+            @LoginMember Long id
     ) {
-        authService.deleteAccount(email);
+        authService.deleteAccount(id);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 

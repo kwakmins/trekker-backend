@@ -65,36 +65,34 @@ class TaskServiceTest {
         // then
         assertThat(taskId).isEqualTo(task.getId());
     }
-    @DisplayName("할 일 생성시 프로젝트 시작 날짜 이전에 등록될 경우 오류를 발생한다.")
+    @DisplayName("작업 시작 날짜가 프로젝트 시작 날짜 이전이면 예외를 발생한다.")
     @Test
-    void addTaskFailDueToInvalidDates_1() {
-        //given
-        TaskReqDto taskReqDto = TaskReqDto.builder()
-                .startDate(LocalDate.now().minusDays(1))
-                .build();
+    void validateTaskDatesStartDateBeforeProjectStart() {
+        // given
+        LocalDate invalidStartDate = project.getStartDate().minusDays(1); // 프로젝트 시작일보다 하루 전
+        LocalDate validEndDate = project.getStartDate().plusDays(1);
 
-        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
-                Optional.of(project));
-
-        //when & then
-        assertThatThrownBy(() -> taskService.addTask(member.getId(), project.getId(), taskReqDto))
+        // when & then
+        assertThatThrownBy(() -> taskService.validateTaskDatesWithinProject(project, invalidStartDate, validEndDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.TASK_BAD_REQUEST.getMessage());
     }
-    @DisplayName("할 일 생성시 종료 날짜가 시작 날짜 이전에 등록될 경우 오류를 발생한다.")
+
+    @DisplayName("작업 종료 날짜가 프로젝트 종료 날짜 이후면 예외를 발생한다.")
     @Test
-    void addTaskFailDueToInvalidDates_2() {
-        //given
-        TaskReqDto taskReqDto = TaskReqDto.builder()
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().minusDays(1))
+    void validateTaskDatesEndDateAfterProjectEnd() {
+        // given
+        LocalDate projectStartDate = LocalDate.now();
+        LocalDate validStartDate = projectStartDate;
+        LocalDate invalidEndDate = projectStartDate.plusDays(10); // 프로젝트 종료일 이후 날짜 설정
+        Project project = Project.builder()
+                .id(1L)
+                .startDate(projectStartDate)
+                .endDate(projectStartDate.plusDays(5)) // 프로젝트 종료일 설정
                 .build();
 
-        when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
-                Optional.of(project));
-
-        //when & then
-        assertThatThrownBy(() -> taskService.addTask(member.getId(), project.getId(), taskReqDto))
+        // when & then
+        assertThatThrownBy(() -> taskService.validateTaskDatesWithinProject(project, validStartDate, invalidEndDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.TASK_BAD_REQUEST.getMessage());
     }
@@ -106,6 +104,7 @@ class TaskServiceTest {
         Task task = Task.builder()
                 .id(1L)
                 .start_date(LocalDate.now())
+                .isCompleted(true)
                 .build();
 
         when(projectRepository.findProjectByIdWIthMember(project.getId())).thenReturn(
@@ -144,7 +143,6 @@ class TaskServiceTest {
 
         // then
         assertThat(task.getName()).isEqualTo(taskReqDto.name());
-        assertThat(task.getStatus()).isEqualTo("하는중");
     }
     @DisplayName("할 일을 삭제한다.")
     @Test

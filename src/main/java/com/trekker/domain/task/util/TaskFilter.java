@@ -6,11 +6,13 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+
+/**
+ * 태스크(Task)와 관련된 유틸리티 메서드를 제공하는 클래스입니다.
+ * 날짜 범위 확인 및 특정 날짜에 완료된 태스크 여부를 판단하는 기능을 포함합니다.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TaskFilter {
-
-    private static final String IS_COMPLETED = "완료";
-
 
     /**
      * 특정 날짜(reqDate)가 주어진 날짜 범위(startDate ~ endDate)에 포함되는지 확인합니다.
@@ -37,7 +39,10 @@ public final class TaskFilter {
      */
     public static boolean isTaskCompletedOnDate(List<Task> tasks, LocalDate date) {
         return tasks.stream()
-                .anyMatch(
-                        task -> date.equals(task.getStartDate()) && IS_COMPLETED.equals(task.getStatus()));
+                .anyMatch(task ->
+                        !date.isBefore(task.getStartDate()) && // date >= startDate
+                                (task.getEndDate() == null || !date.isAfter(task.getEndDate())) && // endDate가 null이거나 date <= endDate
+                                task.getIsCompleted() // 완료된 태스크
+                );
     }
 }

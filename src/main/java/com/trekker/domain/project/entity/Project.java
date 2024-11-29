@@ -46,6 +46,7 @@ public class Project extends BaseEntity {
 
     @Column(name = "end_date")
     private LocalDate endDate;
+
     // 프로젝트 완료 여부
     @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted;

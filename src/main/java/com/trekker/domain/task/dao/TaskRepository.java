@@ -28,7 +28,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                (t.endDate IS NULL AND t.startDate BETWEEN :startDate AND :endDate) OR
                (t.endDate IS NOT NULL AND t.startDate <= :endDate AND t.endDate >= :startDate)
                )
-        """)
+           """)
     List<Task> findTasksWithinDateRange(@Param("projectId") Long projectId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);

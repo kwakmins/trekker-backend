@@ -10,7 +10,7 @@ public record TaskResDto(
         String name,
         LocalDate start_date,
         LocalDate end_date,
-        String status
+        Boolean isCompleted
 ) {
 
     public static TaskResDto toDto(Task task) {
@@ -19,7 +19,7 @@ public record TaskResDto(
                 .name(task.getName())
                 .start_date(task.getStartDate())
                 .end_date(task.getEndDate())
-                .status(task.getStatus())
+                .isCompleted(task.getIsCompleted())
                 .build();
     }
 }

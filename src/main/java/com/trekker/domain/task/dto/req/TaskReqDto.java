@@ -17,12 +17,12 @@ public record TaskReqDto(
 
 ) {
 
-    public Task toEntity(Project project, String status) {
+    public Task toEntity(Project project) {
         return Task.builder()
                 .name(this.name)
                 .start_date(this.startDate)
                 .end_date(this.endDate)
-                .status(status)
+                .isCompleted(project.getIsCompleted())
                 .project(project)
                 .build();
     }

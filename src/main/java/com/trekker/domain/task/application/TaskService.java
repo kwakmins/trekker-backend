@@ -9,7 +9,6 @@ import com.trekker.domain.task.dto.res.TaskCompletionStatusResDto;
 import com.trekker.domain.task.dto.res.TaskResDto;
 import com.trekker.domain.task.entity.Task;
 import com.trekker.domain.task.util.TaskFilter;
-import com.trekker.domain.task.util.TaskStatusDeterminer;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.time.LocalDate;
@@ -38,12 +37,9 @@ public class TaskService {
         // 할 일 날짜 검증
         validateDates(project, taskReqDto.startDate(), taskReqDto.endDate());
 
-        // 작업 상태 결정 ("하는중", "예정")
-        String status = TaskStatusDeterminer.determineStatus(taskReqDto.startDate(),
-                taskReqDto.endDate());
 
         // Entity로 변환
-        Task task = taskReqDto.toEntity(project, status);
+        Task task = taskReqDto.toEntity(project);
         Task saveTask = taskRepository.save(task);
         return saveTask.getId();
     }
@@ -98,13 +94,8 @@ public class TaskService {
         // 할 일 날짜 검증
         validateDates(task.getProject(), taskReqDto.startDate(), taskReqDto.endDate());
 
-        // 작업 상태 결정 ("하는중", "예정")
-        String status = TaskStatusDeterminer.determineStatus(
-                taskReqDto.startDate(),
-                taskReqDto.endDate());
-
         // 할 일 업데이트
-        task.updateTask(taskReqDto, status);
+        task.updateTask(taskReqDto);
     }
 
     @Transactional

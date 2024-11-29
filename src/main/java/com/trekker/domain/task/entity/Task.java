@@ -38,26 +38,26 @@ public class Task extends BaseEntity {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    private String status;
+    @Column(name = "is_completed", nullable = false)
+    private Boolean isCompleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
 
     @Builder
-    public Task(Long id, String name, LocalDate start_date, LocalDate end_date, String status,
+    public Task(Long id, String name, LocalDate start_date, LocalDate end_date, Boolean isCompleted,
             Project project) {
         this.id = id;
         this.name = name;
         this.startDate = start_date;
         this.endDate = end_date;
-        this.status = status;
+        this.isCompleted = isCompleted;
         this.project = project;
     }
 
-    public void updateTask(TaskReqDto taskReqDto, String status) {
+    public void updateTask(TaskReqDto taskReqDto) {
         this.name = taskReqDto.name();
         this.endDate = taskReqDto.endDate();
-        this.status = status;
     }
 }

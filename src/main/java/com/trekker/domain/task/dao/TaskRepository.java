@@ -27,8 +27,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                (t.endDate IS NOT NULL AND t.startDate <= :endDate AND t.endDate >= :startDate)
                )
         """)
-    // TODO 기간이 설정된 Task중 startDate 이전에 완료된 경우의 필터링 추가
-    //        AND (t.completionDate IS NULL OR t.completionDate > :startDate)
     List<Task> findTasksWithinDateRange(@Param("projectId") Long projectId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);

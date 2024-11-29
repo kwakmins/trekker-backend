@@ -103,7 +103,7 @@ public class ProjectService {
     }
 
     /**
-     * 이메일로 회원을 조회하고 없으면 예외를 발생시킵니다.
+     * 회원을 조회하고 없으면 예외를 발생시킵니다.
      *
      * @param memberId 조회할 회원의 Id
      * @return Member

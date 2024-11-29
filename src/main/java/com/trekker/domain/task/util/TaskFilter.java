@@ -6,6 +6,8 @@ import java.util.List;
 
 public final class TaskFilter {
 
+    private static final String IS_COMPLETED = "완료";
+
     private TaskFilter() {
         // 인스턴스화 방지
     }
@@ -36,6 +38,6 @@ public final class TaskFilter {
     public static boolean isTaskCompletedOnDate(List<Task> tasks, LocalDate date) {
         return tasks.stream()
                 .anyMatch(
-                        task -> date.equals(task.getStartDate()) && "완료".equals(task.getStatus()));
+                        task -> date.equals(task.getStartDate()) && IS_COMPLETED.equals(task.getStatus()));
     }
 }

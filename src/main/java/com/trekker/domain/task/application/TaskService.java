@@ -33,9 +33,13 @@ public class TaskService {
         Project project = findProjectByIdWithMember(projectId);
         project.validateOwner(memberId);
 
+        // 할 일 날짜 검증
+        validateDates(project, taskReqDto.startDate(), taskReqDto.endDate());
+
         // 작업 상태 결정 ("하는중", "예정")
         String status = TaskStatusDeterminer.determineStatus(taskReqDto.startDate(),
                 taskReqDto.endDate());
+
         // Entity로 변환
         Task task = taskReqDto.toEntity(project, status);
         Task saveTask = taskRepository.save(task);
@@ -86,14 +90,15 @@ public class TaskService {
     @Transactional
     public void updateTask(Long memberId, Long taskId, TaskReqDto taskReqDto) {
         // 회원 검증 및 할일 조회
-        Task task = taskRepository.findTaskByIdWithProjectAndMember(taskId)
-                .orElseThrow(
-                        () -> new BusinessException(taskId, "taskId", ErrorCode.TASK_NOT_FOUND)
-                );
+        Task task = findTaskByIdWithProjectAndMember(taskId);
         task.getProject().validateOwner(memberId);
 
+        // 할 일 날짜 검증
+        validateDates(task.getProject(), taskReqDto.startDate(), taskReqDto.endDate());
+
         // 작업 상태 결정 ("하는중", "예정")
-        String status = TaskStatusDeterminer.determineStatus(taskReqDto.startDate(),
+        String status = TaskStatusDeterminer.determineStatus(
+                taskReqDto.startDate(),
                 taskReqDto.endDate());
 
         // 할 일 업데이트
@@ -103,10 +108,7 @@ public class TaskService {
     @Transactional
     public void deleteTask(Long memberId, Long taskId) {
         // 회원 검증 및 할일 조회
-        Task task = taskRepository.findTaskByIdWithProjectAndMember(taskId)
-                .orElseThrow(
-                        () -> new BusinessException(taskId, "taskId", ErrorCode.TASK_NOT_FOUND)
-                );
+        Task task = findTaskByIdWithProjectAndMember(taskId);
         task.getProject().validateOwner(memberId);
 
         // 할 일 삭제
@@ -127,4 +129,46 @@ public class TaskService {
                                 ErrorCode.PROJECT_NOT_FOUND)
                 );
     }
+
+    /**
+     * 테스크 ID로 Task를 조회하고 없으면 예외를 발생시킵니다.
+     *
+     * @param taskId 조회할 테스크의 ID
+     * @return Task
+     */
+    private Task findTaskByIdWithProjectAndMember(Long taskId) {
+        return taskRepository.findTaskByIdWithProjectAndMember(taskId)
+                .orElseThrow(
+                        () -> new BusinessException(taskId, "taskId", ErrorCode.TASK_NOT_FOUND)
+                );
+    }
+
+
+    /**
+     * 작업의 시작일과 종료일이 프로젝트 기간 내에 있는지 검증합니다. 또한 할 일의 종료일이 시작일보다 빠른지를 검증합니다.
+     *
+     * @param project   작업이 속한 프로젝트
+     * @param startDate 작업의 시작일
+     * @param endDate   작업의 종료일 (nullable)
+     * @throws BusinessException 시작일 또는 종료일이 조건을 만족하지 않을 경우 예외를 발생시킵니다.
+     */
+    private void validateDates(Project project, LocalDate startDate, LocalDate endDate) {
+        // startDate 검증: 작업 시작일이 프로젝트 시작일보다 빠른 경우 예외 발생
+        if (project.getStartDate().isAfter(startDate)) {
+            throw new BusinessException(startDate, "startDate", ErrorCode.TASK_BAD_REQUEST);
+        }
+
+        // endDate 검증: 종료일이 null이 아닌 경우 추가 검증 수행
+        if (endDate != null) {
+            // 종료일이 프로젝트 종료일 이후인 경우 예외 발생
+            if (project.getEndDate() != null && endDate.isAfter(project.getEndDate())) {
+                throw new BusinessException(endDate, "endDate", ErrorCode.TASK_BAD_REQUEST);
+            }
+            // 종료일이 시작일보다 빠른 경우 예외 발생
+            if (endDate.isBefore(startDate)) {
+                throw new BusinessException(endDate, "endDate", ErrorCode.TASK_BAD_REQUEST);
+            }
+        }
+    }
+
 }

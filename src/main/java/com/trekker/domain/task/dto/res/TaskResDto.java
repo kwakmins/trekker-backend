@@ -3,6 +3,7 @@ package com.trekker.domain.task.dto.res;
 import com.trekker.domain.task.entity.Task;
 import java.time.LocalDate;
 import lombok.Builder;
+
 @Builder
 public record TaskResDto(
         Long taskId,

@@ -18,14 +18,16 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TaskService {
 
+    private static final int TASK_RANGE_DAYS = 3;
+
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
-    private static final int TASK_RANGE_DAYS = 3;
 
     @Transactional
     public Long addTask(Long memberId, Long projectId, TaskReqDto taskReqDto) {

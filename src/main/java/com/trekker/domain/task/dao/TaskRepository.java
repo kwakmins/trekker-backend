@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("""
@@ -17,6 +18,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            WHERE t.id =:taskId
            """)
     Optional<Task> findTaskByIdWithProjectAndMember(@Param("taskId") Long taskId);
+
     @Query("""
            SELECT t
            FROM Task t

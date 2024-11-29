@@ -6,6 +6,7 @@ import com.trekker.domain.task.dto.res.TaskResDto;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
+
 @Builder
 public record ProjectWithTaskInfoResDto(
         String title,

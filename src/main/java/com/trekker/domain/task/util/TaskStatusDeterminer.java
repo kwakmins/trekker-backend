@@ -2,6 +2,7 @@ package com.trekker.domain.task.util;
 
 import com.trekker.global.exception.custom.BusinessException;
 import java.time.LocalDate;
+
 /**
  * 작업 상태를 결정하는 유틸리티 클래스.
  * 주어진 시작 날짜와 종료 날짜를 기준으로 작업의 상태를 계산합니다.

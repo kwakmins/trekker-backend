@@ -3,14 +3,14 @@ package com.trekker.domain.task.util;
 import com.trekker.domain.task.entity.Task;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TaskFilter {
 
     private static final String IS_COMPLETED = "완료";
 
-    private TaskFilter() {
-        // 인스턴스화 방지
-    }
 
     /**
      * 특정 날짜(reqDate)가 주어진 날짜 범위(startDate ~ endDate)에 포함되는지 확인합니다.

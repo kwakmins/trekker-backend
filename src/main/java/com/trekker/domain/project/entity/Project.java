@@ -4,18 +4,25 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
+import com.trekker.domain.task.entity.Task;
 import com.trekker.global.entity.BaseEntity;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,9 +61,13 @@ public class Project extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Task> taskList = new ArrayList<>();
+
     @Builder
     public Project(Long id, String type, String title, String description, LocalDate startDate,
-            LocalDate endDate, Boolean isCompleted, Member member) {
+            LocalDate endDate, Boolean isCompleted, Member member, List<Task> taskList) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -65,6 +76,7 @@ public class Project extends BaseEntity {
         this.endDate = endDate;
         this.isCompleted = isCompleted;
         this.member = member;
+        this.taskList = taskList;
     }
     public void validateOwner(Long memberId) {
         if (!this.member.getId().equals(memberId)) {

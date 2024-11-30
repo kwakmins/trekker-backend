@@ -25,7 +25,7 @@ public record RetrospectiveReqDto(
         return Retrospective.builder()
                 .task(task)
                 .content(content)
-                .skillList(new ArrayList<>()) // 초기 빈 리스트
+                .retrospectiveSkillList(new ArrayList<>()) // 초기 빈 리스트
                 .build();
     }
 

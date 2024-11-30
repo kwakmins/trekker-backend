@@ -41,17 +41,17 @@ public class Retrospective extends BaseEntity {
     private Task task;
 
     @OneToMany(mappedBy = "retrospective", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RetrospectiveSkill> skillList = new ArrayList<>();
+    private List<RetrospectiveSkill> retrospectiveSkillList = new ArrayList<>();
 
     @Builder
-    public Retrospective(Long id, String content, Task task, List<RetrospectiveSkill> skillList) {
+    public Retrospective(Long id, String content, Task task, List<RetrospectiveSkill> retrospectiveSkillList) {
         this.id = id;
         this.content = content;
         this.task = task;
-        this.skillList = skillList;
+        this.retrospectiveSkillList = retrospectiveSkillList;
     }
 
-    public void updateSkillList(RetrospectiveSkill retrospectiveSkill) {
-        this.skillList.add((retrospectiveSkill));
+    public void updateContent(String content) {
+        this.content =content;
     }
 }

@@ -34,7 +34,11 @@ public enum ErrorCode {
 
     //Task
     TASK_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "할 일 정보를 찾을 수 없습니다.");
+    TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "할 일 정보를 찾을 수 없습니다."),
+
+    //Retrospective
+    RETROSPECTIVE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    RETROSPECTIVE_NOT_FOUND(HttpStatus.NOT_FOUND, "회고를 찾을 수 없습니다.");
 
     //오류 상태코드
     private final HttpStatus httpStatus;

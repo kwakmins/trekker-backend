@@ -40,7 +40,7 @@ public class RetrospectiveSkill {
     @JoinColumn(name = "retrospective_id", nullable = false)
     private Retrospective retrospective;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
 

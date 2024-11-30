@@ -104,73 +104,104 @@ public class RetrospectiveService {
 
     /**
      * 회고와 연결된 스킬 데이터를 저장
-     * <p>
+     *
      * 요청된 소프트 및 하드 스킬 데이터를 회고 엔티티와 연결하여 RetrospectiveSkill 엔티티로 변환하고, 이를 데이터베이스에 Batch 방식으로 저장합니다.
-     * 스킬 이름을 기준으로 Skill 객체를 매핑하여 처리합니다.
+     * 이를 데이터베이스에 Batch 방식으로 저장합니다.
      *
      * @param retrospective 회고 엔티티
      * @param reqDto        요청 DTO
      * @param skillMap      스킬 이름과 객체 매핑
      */
-    private void saveRetrospectiveSkills(Retrospective retrospective, RetrospectiveReqDto reqDto,
-            Map<String, Skill> skillMap) {
-        // 1. 요청된 스킬 데이터를 소프트/하드로 구분하여 처리
-        List<RetrospectiveSkill> retrospectiveSkills = Stream.concat(
-                reqDto.softSkillList().stream()
-                        .map(name -> RetrospectiveSkill.toEntity(SOFT_SKILL, retrospective,
-                                skillMap.get(name))),
-                reqDto.hardSkillList().stream()
-                        .map(name -> RetrospectiveSkill.toEntity(HARD_SKILL, retrospective,
-                                skillMap.get(name)))
-        ).toList();
+    private void saveRetrospectiveSkills(Retrospective retrospective, RetrospectiveReqDto reqDto, Map<String, Skill> skillMap) {
+        // 소프트 스킬 리스트를 RetrospectiveSkill 엔티티로 변환
+        List<RetrospectiveSkill> softSkills = reqDto.softSkillList().stream()
+                .map(skillName -> RetrospectiveSkill.toEntity(SOFT_SKILL, retrospective,
+                        skillMap.get(skillName)))
+                .toList();
 
-        // 2. Batch 저장 처리
-        retrospectiveSkillRepository.saveAll(retrospectiveSkills);
+        // 하드 스킬 리스트를 RetrospectiveSkill 엔티티로 변환
+        List<RetrospectiveSkill> hardSkills = reqDto.hardSkillList().stream()
+                .map(skillName -> RetrospectiveSkill.toEntity(HARD_SKILL, retrospective,
+                        skillMap.get(skillName)))
+                .toList();
+
+        // 소프트 스킬과 하드 스킬을 하나의 리스트로 합침
+        List<RetrospectiveSkill> retrospectiveSkills = new ArrayList<>();
+        retrospectiveSkills.addAll(softSkills);
+        retrospectiveSkills.addAll(hardSkills);
+
+        // 변환된 RetrospectiveSkill 리스트가 비어있지 않으면 배치로 저장
+        if (!retrospectiveSkills.isEmpty()) {
+            retrospectiveSkillRepository.saveAll(retrospectiveSkills);
+        }
     }
 
     /**
-     * 기존 회고의 스킬 데이터를 업데이트
+     * 기존 회고의 스킬 데이터를 업데이트하는 메서드입니다.
+     * 요청된 스킬과 기존 스킬을 비교하여 삭제 및 추가 작업을 수행합니다.
      *
      * @param retrospective 회고 엔티티
-     * @param reqDto        요청 DTO
+     * @param reqDto        회고 업데이트 요청 DTO
      */
-    private void updateRetrospectiveSkills(Retrospective retrospective,
-            RetrospectiveReqDto reqDto) {
+    private void updateRetrospectiveSkills(Retrospective retrospective, RetrospectiveReqDto reqDto) {
         // 1. 요청된 스킬에 대한 Skill 엔티티를 가져옴
         Map<String, Skill> skillMap = findOrCreateSkills(reqDto);
 
-        // 2. 기존 및 요청된 스킬 데이터를 Map으로 변환
-        // 기존 RetrospectiveSkill 데이터를 Map 형태로 변환
-        Map<String, RetrospectiveSkill> existingSkills = retrospective.getRetrospectiveSkillList()
-                .stream()
-                .collect(Collectors.toMap(
-                        retrospectiveSkill -> retrospectiveSkill.getSkill().getName(), // 스킬 이름
-                        retrospectiveSkill -> retrospectiveSkill // RetrospectiveSkill 객체
-                ));
+        // 2. 기존 스킬 이름 Set
+        Set<String> existingSkillNames = retrospective.getRetrospectiveSkillList().stream()
+                .map(rs -> rs.getSkill().getName())
+                .collect(Collectors.toSet());
+
+        // 3. 요청된 스킬 이름과 유형 맵 생성
         Map<String, String> requestedSkillMap = createRequestedSkillMap(reqDto);
 
-        // 3. 삭제 작업: 요청에 없는 기존 스킬 삭제
-        retrospectiveSkillRepository.deleteAll(
-                existingSkills.values().stream()
-                        .filter(skill -> !requestedSkillMap.containsKey(skill.getSkill().getName()))
-                        .toList()
-        );
+        // 4. 삭제할 스킬 식별 (기존에 있으나 요청에 없는 스킬)
+        Set<String> skillsToRemove = new HashSet<>(existingSkillNames);
+        skillsToRemove.removeAll(requestedSkillMap.keySet());
 
-        // 4. 추가 작업: 요청된 스킬 중 기존에 없는 스킬 추가
-        retrospectiveSkillRepository.saveAll(
-                requestedSkillMap.entrySet().stream()
-                        .filter(entry -> !existingSkills.containsKey(entry.getKey()))
-                        .map(entry -> RetrospectiveSkill.toEntity(entry.getValue(), retrospective,
-                                skillMap.get(entry.getKey())))
-                        .toList()
-        );
+        if (!skillsToRemove.isEmpty()) {
+            // 삭제할 스킬 리스트 생성
+            List<RetrospectiveSkill> skillsToDelete = retrospective.getRetrospectiveSkillList()
+                    .stream()
+                    .filter(rs -> skillsToRemove.contains(rs.getSkill().getName()))
+                    .collect(Collectors.toList());
+
+            // 스킬 삭제
+            retrospectiveSkillRepository.deleteAll(skillsToDelete);
+        }
+
+        // 5. 추가할 스킬 식별 (요청에 있으나 기존에 없는 스킬)
+        Set<String> skillsToAdd = new HashSet<>(requestedSkillMap.keySet());
+        skillsToAdd.removeAll(existingSkillNames);
+
+        if (!skillsToAdd.isEmpty()) {
+            // 추가할 스킬 리스트 생성
+            List<RetrospectiveSkill> skillsToAddList = skillsToAdd.stream()
+                    .map(skillName -> RetrospectiveSkill.toEntity(requestedSkillMap.get(skillName),
+                            retrospective, skillMap.get(skillName)))
+                    .collect(Collectors.toList());
+
+            // 스킬 추가 저장
+            retrospectiveSkillRepository.saveAll(skillsToAddList);
+        }
     }
 
+    /**
+     * 요청된 스킬 목록을 소프트/하드로 구분하여 맵으로 변환하는 메서드입니다.
+     *
+     * @param reqDto 회고 요청 DTO
+     * @return 스킬 이름과 스킬 유형 매핑
+     */
     private Map<String, String> createRequestedSkillMap(RetrospectiveReqDto reqDto) {
-        return Stream.concat(
-                reqDto.softSkillList().stream().map(skillName -> Map.entry(skillName, SOFT_SKILL)),
-                reqDto.hardSkillList().stream().map(skillName -> Map.entry(skillName, HARD_SKILL))
-        ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, String> skillMap = new HashMap<>();
+
+        // 소프트 스킬 추가
+        reqDto.softSkillList().forEach(skillName -> skillMap.put(skillName, SOFT_SKILL));
+
+        // 하드 스킬 추가
+        reqDto.hardSkillList().forEach(skillName -> skillMap.put(skillName, HARD_SKILL));
+
+        return skillMap;
     }
 
     /**
@@ -234,7 +265,7 @@ public class RetrospectiveService {
     private void validateTaskCompletion(Task task) {
         if (task.getIsCompleted()) {
             throw new BusinessException(task.getId(), "taskId",
-                    ErrorCode.RETROSPECTIVE_BAD_REQUEST);
+                    ErrorCode.TASK_BAD_REQUEST);
         }
     }
 

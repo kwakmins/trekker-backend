@@ -48,7 +48,7 @@ public class Task extends BaseEntity {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToOne(mappedBy = "task", fetch = FetchType.LAZY,  cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "task", fetch = FetchType.LAZY,cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Retrospective retrospective;
 
     @Builder
@@ -68,7 +68,7 @@ public class Task extends BaseEntity {
         this.endDate = taskReqDto.endDate();
     }
 
-    public void updateCompleted(boolean isCompleted) {
+    public void updateCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
 }

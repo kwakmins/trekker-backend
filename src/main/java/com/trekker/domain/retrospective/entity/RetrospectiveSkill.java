@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "retrospective_skills")
 public class RetrospectiveSkill {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "retrospective_skill_seq")
     @SequenceGenerator(
@@ -36,11 +35,11 @@ public class RetrospectiveSkill {
     @Column(name = "type", nullable = false)
     private String type;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "retrospective_id", nullable = false)
     private Retrospective retrospective;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
 

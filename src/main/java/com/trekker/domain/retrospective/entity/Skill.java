@@ -29,14 +29,10 @@ public class Skill {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "skill", orphanRemoval = true)
-    private List<RetrospectiveSkill> retrospectiveSkillList = new ArrayList<>();
-
     @Builder
-    public Skill(Long id, String name, List<RetrospectiveSkill> retrospectiveSkillList) {
+    public Skill(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.retrospectiveSkillList = retrospectiveSkillList;
     }
 
     public static Skill toEntity(String name) {

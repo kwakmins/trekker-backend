@@ -18,6 +18,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        jdbc.batch_size: 10
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_versioned_data: true
 
 #p6spy
 decorator:

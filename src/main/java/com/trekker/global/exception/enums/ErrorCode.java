@@ -30,7 +30,11 @@ public enum ErrorCode {
 
     //Project
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트 정보를 찾을 수 없습니다."),
-    PROJECT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
+    PROJECT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+
+    //Task
+    TASK_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    TASK_NOT_FOUND(HttpStatus.NOT_FOUND, "할 일 정보를 찾을 수 없습니다.");
 
     //오류 상태코드
     private final HttpStatus httpStatus;

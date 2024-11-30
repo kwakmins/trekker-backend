@@ -10,13 +10,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Long> {
+
     // 이름 목록에 해당하는 Skill을 연관 데이터를 패치 조인으로 조회
     @Query("""
-           SELECT s 
-           FROM Skill s 
-           LEFT JOIN FETCH s.retrospectiveSkillList 
+           SELECT s
+           FROM Skill s
            WHERE s.name IN :names
            """)
-    List<Skill> findByNameInWithRestrospectiveSkillList(@Param("names") Collection<String> names);
+    List<Skill> findByNameIn(@Param("names") Collection<String> names);
 
 }

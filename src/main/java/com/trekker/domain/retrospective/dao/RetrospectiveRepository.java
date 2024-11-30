@@ -15,5 +15,5 @@ public interface RetrospectiveRepository extends JpaRepository<Retrospective, Lo
           JOIN FETCH sl.skill
           WHERE r.id =:retrospectiveId
           """)
-   Optional<Retrospective> findByIdWithSkillListAndSkill(@Param("retrospectiveId") Long retrospectiveId);
+   Optional<Retrospective> findByIdWithSkillList(@Param("retrospectiveId") Long retrospectiveId);
 }

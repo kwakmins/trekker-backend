@@ -4,6 +4,7 @@ import com.trekker.domain.retrospective.dao.RetrospectiveRepository;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
 import com.trekker.domain.retrospective.dao.SkillRepository;
 import com.trekker.domain.retrospective.dto.req.RetrospectiveReqDto;
+import com.trekker.domain.retrospective.dto.res.RetrospectiveResDto;
 import com.trekker.domain.retrospective.entity.Retrospective;
 import com.trekker.domain.retrospective.entity.RetrospectiveSkill;
 import com.trekker.domain.retrospective.entity.Skill;
@@ -24,17 +25,21 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class RetrospectiveService {
 
+    private static final String SOFT_SKILL = "소프트";
+    private static final String HARD_SKILL = "하드";
+
+
     private final RetrospectiveRepository retrospectiveRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
     private final SkillRepository skillRepository;
     private final TaskRepository taskRepository;
 
     /**
-     * 새로운 회고를 추가하는 메서드
+     * 새로운 회고를 추가
      */
     @Transactional
     public Long addRetrospective(Long memberId, Long taskId, RetrospectiveReqDto reqDto) {
-        // 1. 태스크 소유권 검증 및 완료 여부 확인
+        // 1. 할 일 작성자 확인
         Task task = validateTaskOwnership(memberId, taskId);
         validateTaskCompletion(task);
 
@@ -53,23 +58,48 @@ public class RetrospectiveService {
         return retrospective.getId();
     }
 
+    public RetrospectiveResDto getRetrospective(Long memberId, Long taskId, Long retrospectiveId) {
+        // 1. 할 일 작성자 확인
+        Task task = validateTaskOwnership(memberId, taskId);
+
+        // 2. 회고 및 연관 스킬 조회
+        Retrospective retrospective = findRetrospectiveByIdWithSkillList(retrospectiveId);
+
+        // 3. DTO로 변환 및 반환
+        return RetrospectiveResDto.toDto(task.getName(), retrospective);
+    }
+
     /**
-     * 기존 회고를 업데이트하는 메서드
+     * 기존 회고를 업데이트
      */
     @Transactional
     public void updateRetrospective(Long memberId, Long taskId, Long retrospectiveId,
             RetrospectiveReqDto reqDto) {
-        // 1. 태스크 소유권 검증
+        // 1. 할 일 작성자 확인
         validateTaskOwnership(memberId, taskId);
 
         // 2. 회고 엔티티 및 관련 데이터 조회
-        Retrospective retrospective = findByIdWithSkillListAndSkill(retrospectiveId);
+        Retrospective retrospective = findRetrospectiveByIdWithSkillList(retrospectiveId);
 
         // 3. 회고 내용 업데이트
         retrospective.updateContent(reqDto.content());
 
         // 4. 기존 스킬과 새로운 스킬 비교 및 갱신
         updateRetrospectiveSkills(retrospective, reqDto);
+    }
+
+    @Transactional
+    public void deleteRetrospective(Long memberId, Long taskId, Long retrospectiveId) {
+        // 1. 할 일 작성자 확인
+        Task task = validateTaskOwnership(memberId, taskId);
+
+        // 2. 회고 엔티티 및 관련 데이터 조회
+        Retrospective retrospective = findRetrospectiveByIdWithSkillList(retrospectiveId);
+
+        // 3. 태스크 완료 상태 업데이트
+       task.updateCompleted(false);
+
+       retrospectiveRepository.delete(retrospective);
     }
 
     /**
@@ -87,10 +117,10 @@ public class RetrospectiveService {
         // 1. 요청된 스킬 데이터를 소프트/하드로 구분하여 처리
         List<RetrospectiveSkill> retrospectiveSkills = Stream.concat(
                 reqDto.softSkillList().stream()
-                        .map(name -> RetrospectiveSkill.toEntity("소프트", retrospective,
+                        .map(name -> RetrospectiveSkill.toEntity(SOFT_SKILL, retrospective,
                                 skillMap.get(name))),
                 reqDto.hardSkillList().stream()
-                        .map(name -> RetrospectiveSkill.toEntity("하드", retrospective,
+                        .map(name -> RetrospectiveSkill.toEntity(HARD_SKILL, retrospective,
                                 skillMap.get(name)))
         ).toList();
 
@@ -138,11 +168,10 @@ public class RetrospectiveService {
 
     private Map<String, String> createRequestedSkillMap(RetrospectiveReqDto reqDto) {
         return Stream.concat(
-                reqDto.softSkillList().stream().map(skillName -> Map.entry(skillName, "소프트")),
-                reqDto.hardSkillList().stream().map(skillName -> Map.entry(skillName, "하드"))
+                reqDto.softSkillList().stream().map(skillName -> Map.entry(skillName, SOFT_SKILL)),
+                reqDto.hardSkillList().stream().map(skillName -> Map.entry(skillName, HARD_SKILL))
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
-
 
     /**
      * 요청된 스킬 데이터를 조회하거나 새로 생성하여 반환
@@ -215,8 +244,8 @@ public class RetrospectiveService {
      * @param retrospectiveId 회고 ID
      * @return 조회된 Retrospective 엔티티
      */
-    private Retrospective findByIdWithSkillListAndSkill(Long retrospectiveId) {
-        return retrospectiveRepository.findByIdWithSkillListAndSkill(retrospectiveId)
+    private Retrospective findRetrospectiveByIdWithSkillList(Long retrospectiveId) {
+        return retrospectiveRepository.findByIdWithSkillList(retrospectiveId)
                 .orElseThrow(() -> new BusinessException(retrospectiveId, "retrospectiveId",
                         ErrorCode.RETROSPECTIVE_NOT_FOUND));
     }

@@ -12,7 +12,6 @@ import com.trekker.domain.task.dao.TaskRepository;
 import com.trekker.domain.task.entity.Task;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.trekker.domain.project.application.ProjectService;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
+import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,10 +63,19 @@ public class ProjectController {
     public ResponseEntity<Void> deleteProject(
             @LoginMember Long memberId,
             @PathVariable(name = "projectId") Long projectId
-            ) {
+    ) {
         projectService.deleteProject(memberId, projectId);
 
         return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @GetMapping("/{projectId}/skill-summary")
+    public ResponseEntity<ProjectSkillSummaryResDto> getProjectSkillSummary(
+            @LoginMember Long memberId,
+            @PathVariable Long projectId) {
+        ProjectSkillSummaryResDto summary = projectService.getProjectSkillSummary(memberId,
+                projectId);
+        return ResponseEntity.ok(summary);
     }
 }
 

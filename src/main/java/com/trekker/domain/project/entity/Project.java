@@ -18,7 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -90,5 +89,16 @@ public class Project extends BaseEntity {
         this.description = projectReqDto.description();
         this.startDate = projectReqDto.startDate();
         this.endDate = projectReqDto.endDate();
+    }
+
+    public void updateCompleted() {
+        this.isCompleted = true;
+    }
+
+    public void updateEndDate(LocalDate endDate) {
+        if (this.isCompleted) {
+            throw new BusinessException(isCompleted, "isCompleted", ErrorCode.PROJECT_BAD_REQUEST);
+        }
+        this.endDate = endDate;
     }
 }

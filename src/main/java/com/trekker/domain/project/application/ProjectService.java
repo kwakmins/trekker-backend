@@ -3,7 +3,10 @@ package com.trekker.domain.project.application;
 import com.trekker.domain.member.dao.MemberRepository;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dao.ProjectRepository;
+import com.trekker.domain.project.dao.ProjectRetrospectiveRepository;
+import com.trekker.domain.project.dto.req.ProjectExtendReqDto;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
+import com.trekker.domain.project.dto.req.ProjectRetrospectiveReqDto;
 import com.trekker.domain.project.dto.res.ProjectResDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
 import com.trekker.domain.project.entity.Project;
@@ -29,6 +32,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
+    private final ProjectRetrospectiveRepository projectRetrospectiveRepository;
 
     @Transactional
     public Long addProject(Long memberId, ProjectReqDto projectReqDto) {
@@ -36,7 +40,7 @@ public class ProjectService {
         Member member = findById(memberId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
-        validateProjectDates(projectReqDto);
+        validateProjectDates(projectReqDto.startDate(), projectReqDto.endDate());
 
         // dto를 Entity로 변경
         Project project = projectReqDto.toEntity(member);
@@ -86,7 +90,7 @@ public class ProjectService {
         Project project = findProjectByIdWithMember(projectId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
-        validateProjectDates(projectReqDto);
+        validateProjectDates(projectReqDto.startDate(), projectReqDto.endDate());
 
         // 회원이 프로젝트 소유자인지 검증
         project.validateOwner(memberId);
@@ -123,6 +127,30 @@ public class ProjectService {
         return ProjectSkillSummaryResDto.toDto(project, topSoftSkills, topHardSkills);
     }
 
+    @Transactional
+    public void closeProject(Long memberId, Long projectId, ProjectRetrospectiveReqDto reqDto) {
+        // 회원 및 프로젝트 조회 및 검증
+        Project project = findProjectByIdWithMember(projectId);
+        project.validateOwner(memberId);
+
+        project.updateCompleted();
+
+        projectRetrospectiveRepository.save(reqDto.toEntity(project));
+    }
+
+    @Transactional
+    public void extendProject(Long memberId, Long projectId, ProjectExtendReqDto reqDto) {
+        // 회원 및 프로젝트 조회 및 검증
+        Project project = findProjectByIdWithMember(projectId);
+        project.validateOwner(memberId);
+
+        // 종료 날짜가 시작 날짜보다 이전인지 검증
+        validateProjectDates(project.getStartDate(), reqDto.endDate());
+
+        // 종료 날짜 업데이트
+        project.updateEndDate(reqDto.endDate());
+    }
+
     /**
      * 회원을 조회하고 없으면 예외를 발생시킵니다.
      *
@@ -153,10 +181,10 @@ public class ProjectService {
     /**
      * 종료날자가 시작 날짜 이전인지 검증
      */
-    private static void validateProjectDates(ProjectReqDto projectReqDto) {
-        if (projectReqDto.endDate() != null) {
-            if (projectReqDto.endDate().isBefore(projectReqDto.startDate())) {
-                throw new BusinessException(projectReqDto.endDate(), "endDate",
+    private static void validateProjectDates(LocalDate startDate, LocalDate endDate) {
+        if (endDate != null) {
+            if (endDate.isBefore(startDate)) {
+                throw new BusinessException(endDate, "endDate",
                         ErrorCode.PROJECT_BAD_REQUEST);
             }
         }

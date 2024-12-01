@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record RetrospectiveReqDto(
 
         // 소프트 스틸 목록

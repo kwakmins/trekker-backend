@@ -11,9 +11,13 @@ import com.trekker.domain.project.dao.ProjectRepository;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
 import com.trekker.domain.project.entity.Project;
+import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
+import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
+import com.trekker.domain.task.dto.SkillCountDto;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
@@ -33,6 +38,9 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private RetrospectiveSkillRepository retrospectiveSkillRepository;
     private Member mockMember;
     private static final Long memberId =1L;
 
@@ -114,6 +122,42 @@ class ProjectServiceTest {
         assertThat(resDto.projectList().size()).isEqualTo(1);
         assertThat(resDto.projectList().get(0).title()).isEqualTo(project.getTitle());
 
+    }
+
+    @DisplayName("프로젝트의 상위 3개 소프트 스킬과 하드 스킬을 반환한다.")
+    @Test
+    void getProjectSkillSummary() {
+        // given
+        Long projectId = 1L;
+        Project mockProject = mock(Project.class);
+
+        List<SkillCountDto> softSkills = Arrays.asList(
+                new SkillCountDto("Communication", 10L),
+                new SkillCountDto("Teamwork", 8L),
+                new SkillCountDto("Leadership", 6L)
+        );
+
+        List<SkillCountDto> hardSkills = Arrays.asList(
+                new SkillCountDto("Java", 12L),
+                new SkillCountDto("Spring", 9L),
+                new SkillCountDto("Hibernate", 7L)
+        );
+
+        doNothing().when(mockProject).validateOwner(memberId);
+        when(projectRepository.findProjectByIdWIthMember(projectId)).thenReturn(Optional.of(mockProject));
+        when(retrospectiveSkillRepository.findTopSkillsByType(projectId, "소프트", PageRequest.of(0, 3)))
+                .thenReturn(softSkills);
+        when(retrospectiveSkillRepository.findTopSkillsByType(projectId, "하드", PageRequest.of(0, 3)))
+                .thenReturn(hardSkills);
+
+
+        // when
+        // 테스트 대상 메서드 호출
+        ProjectSkillSummaryResDto result = projectService.getProjectSkillSummary(memberId, projectId);
+
+        // then
+        assertThat(result.topSoftSkillList()).isEqualTo(softSkills);
+        assertThat(result.topHardSkillList()).isEqualTo(hardSkills);
     }
 
     @DisplayName("기존의 프로젝트를 수정한다.")

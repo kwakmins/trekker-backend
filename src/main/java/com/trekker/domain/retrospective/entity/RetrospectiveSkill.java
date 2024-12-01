@@ -27,7 +27,7 @@ public class RetrospectiveSkill {
     @SequenceGenerator(
             name = "retrospective_skill_seq",
             sequenceName = "retrospective_skill_sequence",
-            allocationSize = 10
+            allocationSize = 30
     )
     private Long id;
 

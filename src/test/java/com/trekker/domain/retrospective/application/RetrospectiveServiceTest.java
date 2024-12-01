@@ -1,7 +1,6 @@
 package com.trekker.domain.retrospective.application;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.trekker.domain.member.entity.Member;

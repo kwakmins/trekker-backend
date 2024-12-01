@@ -35,6 +35,7 @@ public class RetrospectiveService {
 
     /**
      * 새로운 회고를 추가
+     * 회고에 연관된 소프트 및 하드 스킬을 RetrospectiveSkill 엔티티로 변환하여 일괄 저장합니다.
      */
     @Transactional
     public Long addRetrospective(Long memberId, Long taskId, RetrospectiveReqDto reqDto) {
@@ -57,6 +58,15 @@ public class RetrospectiveService {
         return retrospective.getId();
     }
 
+    /**
+     * 기존 회고를 조회합니다.
+     *
+     * @param memberId 회원 ID
+     * @param taskId 할 일 ID
+     * @param retrospectiveId 회고 ID
+     * @return 할일 이름, 회고 내용과 소프트/하드 스킬이 포함된 DTO
+     */
+
     public RetrospectiveResDto getRetrospective(Long memberId, Long taskId, Long retrospectiveId) {
         // 1. 할 일 작성자 확인
         Task task = validateTaskOwnership(memberId, taskId);
@@ -69,7 +79,8 @@ public class RetrospectiveService {
     }
 
     /**
-     * 기존 회고를 업데이트
+     * 기존 회고를 업데이트합니다.
+     * 회고 내용과 관련 스킬을 갱신합니다.
      */
     @Transactional
     public void updateRetrospective(Long memberId, Long taskId, Long retrospectiveId,
@@ -87,6 +98,10 @@ public class RetrospectiveService {
         updateRetrospectiveSkills(retrospective, reqDto);
     }
 
+    /**
+     * 기존 회고를 삭제합니다.
+     * 회고 삭제시 RetrospectiveSkill 도 함께 삭제됩니다.
+     */
     @Transactional
     public void deleteRetrospective(Long memberId, Long taskId, Long retrospectiveId) {
         // 1. 할 일 작성자 확인
@@ -104,7 +119,7 @@ public class RetrospectiveService {
     /**
      * 회고와 연결된 스킬 데이터를 저장
      *
-     * 요청된 소프트 및 하드 스킬 데이터를 회고 엔티티와 연결하여 RetrospectiveSkill 엔티티로 변환하고, 이를 데이터베이스에 Batch 방식으로 저장합니다.
+     * 요청된 소프트 및 하드 스킬 데이터를 회고 엔티티와 연결하여 RetrospectiveSkill 엔티티로 변환하고,
      * 이를 데이터베이스에 Batch 방식으로 저장합니다.
      *
      * @param retrospective 회고 엔티티
@@ -129,10 +144,8 @@ public class RetrospectiveService {
         retrospectiveSkills.addAll(softSkills);
         retrospectiveSkills.addAll(hardSkills);
 
-        // 변환된 RetrospectiveSkill 리스트가 비어있지 않으면 배치로 저장
-        if (!retrospectiveSkills.isEmpty()) {
-            retrospectiveSkillRepository.saveAll(retrospectiveSkills);
-        }
+        // 변환된 RetrospectiveSkill 리스트 배치로 저장
+        retrospectiveSkillRepository.saveAll(retrospectiveSkills);
     }
 
     /**

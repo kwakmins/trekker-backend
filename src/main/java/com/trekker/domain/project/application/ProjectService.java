@@ -106,14 +106,17 @@ public class ProjectService {
         // 프로젝트 삭제
         projectRepository.delete(project);
     }
+
     public ProjectSkillSummaryResDto getProjectSkillSummary(Long memberId, Long projectId) {
         // 회원 및 프로젝트 조회 및 검증
         Project project = findProjectByIdWithMember(projectId);
         project.validateOwner(memberId);
 
+        // 상위 3개의 소프트 스킬 반환
         List<SkillCountDto> topSoftSkills = retrospectiveSkillRepository.findTopSkillsByType(
                 projectId, "소프트", PageRequest.of(0, 3));
 
+        // 상위 3개의 하드 스킬 반환
         List<SkillCountDto> topHardSkills = retrospectiveSkillRepository.findTopSkillsByType(
                 projectId, "하드", PageRequest.of(0, 3));
 

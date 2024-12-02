@@ -63,16 +63,16 @@ public class RetrospectiveService {
      *
      * @param memberId 회원 ID
      * @param taskId 할 일 ID
-     * @param retrospectiveId 회고 ID
-     * @return 할일 이름, 회고 내용과 소프트/하드 스킬이 포함된 DTO
+=     * @return 할일 이름, 회고 내용과 소프트/하드 스킬이 포함된 DTO
      */
 
-    public RetrospectiveResDto getRetrospective(Long memberId, Long taskId, Long retrospectiveId) {
+    public RetrospectiveResDto getRetrospective(Long memberId, Long taskId) {
         // 1. 할 일 작성자 확인
         Task task = validateTaskOwnership(memberId, taskId);
 
         // 2. 회고 및 연관 스킬 조회
-        Retrospective retrospective = findRetrospectiveByIdWithSkillList(retrospectiveId);
+        Retrospective retrospective = findRetrospectiveByIdWithSkillList(
+                task.getRetrospective().getId());
 
         // 3. DTO로 변환 및 반환
         return RetrospectiveResDto.toDto(task.getName(), retrospective);
@@ -83,13 +83,13 @@ public class RetrospectiveService {
      * 회고 내용과 관련 스킬을 갱신합니다.
      */
     @Transactional
-    public void updateRetrospective(Long memberId, Long taskId, Long retrospectiveId,
-            RetrospectiveReqDto reqDto) {
+    public void updateRetrospective(Long memberId, Long taskId, RetrospectiveReqDto reqDto) {
         // 1. 할 일 작성자 확인
-        validateTaskOwnership(memberId, taskId);
+        Task task = validateTaskOwnership(memberId, taskId);
 
         // 2. 회고 엔티티 및 관련 데이터 조회
-        Retrospective retrospective = findRetrospectiveByIdWithSkillList(retrospectiveId);
+        Retrospective retrospective = findRetrospectiveByIdWithSkillList(task.getRetrospective()
+                .getId());
 
         // 3. 회고 내용 업데이트
         retrospective.updateContent(reqDto.content());
@@ -103,17 +103,12 @@ public class RetrospectiveService {
      * 회고 삭제시 RetrospectiveSkill 도 함께 삭제됩니다.
      */
     @Transactional
-    public void deleteRetrospective(Long memberId, Long taskId, Long retrospectiveId) {
+    public void deleteRetrospective(Long memberId, Long taskId) {
         // 1. 할 일 작성자 확인
         Task task = validateTaskOwnership(memberId, taskId);
 
-        // 2. 회고 엔티티 및 관련 데이터 조회
-        Retrospective retrospective = findRetrospectiveByIdWithSkillList(retrospectiveId);
-
-        // 3. 태스크 완료 상태 업데이트
-       task.updateCompleted(false);
-
-       retrospectiveRepository.delete(retrospective);
+        // 2. 태스크 완료 상태 업데이트 및 연관관계 삭제 (고아 객체 상태로 만들어서 삭제)
+        task.unlinkRetrospectiveAndUpdateCompleted();
     }
 
     /**

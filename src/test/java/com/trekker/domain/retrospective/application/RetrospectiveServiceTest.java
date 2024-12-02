@@ -55,12 +55,6 @@ class RetrospectiveServiceTest {
 
     @BeforeEach
     void setUp() {
-        task = Task.builder()
-                .id(1L)
-                .isCompleted(false)
-                .project(Project.builder().id(1L).member(Member.builder().id(1L).build()).build())
-                .build();
-
         softSkill = Skill.builder()
                 .id(1L)
                 .name("커뮤니케이션")
@@ -82,6 +76,13 @@ class RetrospectiveServiceTest {
                 .content("Initial Retrospective")
                 .task(task)
                 .retrospectiveSkillList(new ArrayList<>())
+                .build();
+
+        task = Task.builder()
+                .id(1L)
+                .isCompleted(false)
+                .retrospective(retrospective)
+                .project(Project.builder().id(1L).member(Member.builder().id(1L).build()).build())
                 .build();
 
         memberId = 1L;
@@ -158,8 +159,7 @@ class RetrospectiveServiceTest {
                 .thenReturn(Optional.of(retrospective));
 
         // when
-        RetrospectiveResDto resDto = retrospectiveService.getRetrospective(memberId, task.getId(),
-                retrospective.getId());
+        RetrospectiveResDto resDto = retrospectiveService.getRetrospective(memberId, task.getId());
 
         // then
         assertThat(resDto.softSkillList().size()).isEqualTo(1);
@@ -193,8 +193,7 @@ class RetrospectiveServiceTest {
                 .thenReturn(Arrays.asList(softSkill, hardSkill));
 
         // when
-        retrospectiveService.updateRetrospective(memberId, task.getId(), retrospective.getId(),
-                updateDto);
+        retrospectiveService.updateRetrospective(memberId, task.getId(), updateDto);
 
         // then
         assertThat(retrospective.getContent()).isEqualTo(updateDto.content());
@@ -210,19 +209,17 @@ class RetrospectiveServiceTest {
         Task completedTask = Task.builder()
                 .id(1L)
                 .project(Project.builder().id(1L).member(Member.builder().id(memberId).build()).build())
+                .retrospective(retrospective)
                 .isCompleted(true)
                 .build();
 
         when(taskRepository.findTaskByIdWithProjectAndMemberWithRetrospective(task.getId()))
                 .thenReturn(Optional.of(completedTask));
-        when(retrospectiveRepository.findByIdWithSkillList(retrospective.getId()))
-                .thenReturn(Optional.of(retrospective));
 
         // when
-        retrospectiveService.deleteRetrospective(memberId, task.getId(), retrospective.getId());
+        retrospectiveService.deleteRetrospective(memberId, task.getId());
 
         // then
         assertThat(task.getIsCompleted()).isEqualTo(false);
-        verify(retrospectiveRepository, times(1)).delete(retrospective);
     }
 }

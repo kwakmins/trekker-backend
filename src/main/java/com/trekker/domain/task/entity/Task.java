@@ -71,4 +71,9 @@ public class Task extends BaseEntity {
     public void updateCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
+
+    public void unlinkRetrospectiveAndUpdateCompleted(){
+        this.isCompleted = false;
+        this.retrospective = null;
+    }
 }

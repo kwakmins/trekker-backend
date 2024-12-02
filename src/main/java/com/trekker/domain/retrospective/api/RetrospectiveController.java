@@ -37,37 +37,33 @@ public class RetrospectiveController {
         return ResponseEntity.status(CREATED).body(retrospectiveId);
     }
 
-    @GetMapping("/{retrospectiveId}")
+    @GetMapping
     public ResponseEntity<RetrospectiveResDto> getRetrospective(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId") Long taskId,
-            @PathVariable(name = "retrospectiveId") Long retrospectiveId) {
-        RetrospectiveResDto retrospective = retrospectiveService.getRetrospective(memberId, taskId,
-                retrospectiveId);
+            @PathVariable(name = "taskId") Long taskId
+    ) {
+        RetrospectiveResDto retrospective = retrospectiveService.getRetrospective(memberId, taskId);
 
         return ResponseEntity.ok(retrospective);
     }
 
-    @PutMapping("/{retrospectiveId}")
+    @PutMapping
     public ResponseEntity<Void> updateRetrospective(
             @LoginMember Long memberId,
             @PathVariable(name = "taskId") Long taskId,
-            @PathVariable(name = "retrospectiveId") Long retrospectiveId,
             @Valid @RequestBody RetrospectiveReqDto reqDto
     ) {
-        retrospectiveService.updateRetrospective(memberId, taskId, retrospectiveId, reqDto);
+        retrospectiveService.updateRetrospective(memberId, taskId, reqDto);
 
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
-    @DeleteMapping("/{retrospectiveId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteRetrospective(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId") Long taskId,
-            @PathVariable(name = "retrospectiveId") Long retrospectiveId) {
+            @PathVariable(name = "taskId") Long taskId) {
 
-        retrospectiveService.deleteRetrospective(memberId, taskId,
-                retrospectiveId);
+        retrospectiveService.deleteRetrospective(memberId, taskId);
 
         return ResponseEntity.status(NO_CONTENT).build();
     }

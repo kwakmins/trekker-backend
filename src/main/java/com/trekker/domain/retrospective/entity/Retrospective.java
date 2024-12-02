@@ -37,7 +37,7 @@ public class Retrospective extends BaseEntity {
     private String content;
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "task_id", nullable = false)
+    @JoinColumn(name = "task_id")
     private Task task;
 
     @OneToMany(mappedBy = "retrospective", cascade = CascadeType.ALL, orphanRemoval = true)

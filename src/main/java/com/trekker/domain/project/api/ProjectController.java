@@ -4,14 +4,18 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.trekker.domain.project.application.ProjectService;
+import com.trekker.domain.project.dto.req.ProjectExtendReqDto;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
+import com.trekker.domain.project.dto.req.ProjectRetrospectiveReqDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
+import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -36,6 +40,7 @@ public class ProjectController {
 
         return ResponseEntity.status(CREATED).body(projectId);
     }
+
     @GetMapping
     public ResponseEntity<ProjectWithMemberInfoResDto> getProjectList(
             @LoginMember Long memberId,
@@ -62,9 +67,37 @@ public class ProjectController {
     public ResponseEntity<Void> deleteProject(
             @LoginMember Long memberId,
             @PathVariable(name = "projectId") Long projectId
-            ) {
+    ) {
         projectService.deleteProject(memberId, projectId);
 
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @GetMapping("/{projectId}/skill-summary")
+    public ResponseEntity<ProjectSkillSummaryResDto> getProjectSkillSummary(
+            @LoginMember Long memberId,
+            @PathVariable(name = "projectId") Long projectId) {
+        ProjectSkillSummaryResDto summary = projectService.getProjectSkillSummary(memberId,
+                projectId);
+        return ResponseEntity.ok(summary);
+    }
+
+    @PostMapping("/{projectId}/close")
+    public ResponseEntity<Void> closeProject(
+            @LoginMember Long memberId,
+            @PathVariable(name = "projectId") Long projectId,
+            @Valid @RequestBody ProjectRetrospectiveReqDto reqDto) {
+        projectService.closeProject(memberId, projectId, reqDto);
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @PatchMapping("/{projectId}/extend")
+    public ResponseEntity<Void> extendProject(
+            @LoginMember Long memberId,
+            @PathVariable(name = "projectId") Long projectId,
+            @Valid @RequestBody ProjectExtendReqDto reqDto
+    ) {
+        projectService.extendProject(memberId, projectId, reqDto);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 }

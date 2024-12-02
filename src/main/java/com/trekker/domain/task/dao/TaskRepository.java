@@ -23,6 +23,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            SELECT t
            FROM Task t
            JOIN FETCH t.project
+           LEFT JOIN FETCH t.retrospective
            WHERE t.project.id = :projectId
            AND (
                (t.endDate IS NULL AND t.startDate BETWEEN :startDate AND :endDate) OR
@@ -32,4 +33,14 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTasksWithinDateRange(@Param("projectId") Long projectId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    @Query("""
+           SELECT t
+           FROM Task t
+           JOIN FETCH t.project p
+           LEFT JOIN fetch t.retrospective r
+           JOIN FETCH p.member m
+           WHERE t.id =:taskId
+           """)
+    Optional<Task> findTaskByIdWithProjectAndMemberWithRetrospective(@Param("taskId") Long taskId);
 }

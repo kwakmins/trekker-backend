@@ -3,17 +3,24 @@ package com.trekker.domain.project.application;
 import com.trekker.domain.member.dao.MemberRepository;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dao.ProjectRepository;
+import com.trekker.domain.project.dao.ProjectRetrospectiveRepository;
+import com.trekker.domain.project.dto.req.ProjectExtendReqDto;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
+import com.trekker.domain.project.dto.req.ProjectRetrospectiveReqDto;
 import com.trekker.domain.project.dto.res.ProjectResDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
 import com.trekker.domain.project.entity.Project;
 import com.trekker.domain.project.util.ProjectProgressCalculator;
+import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
+import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
+import com.trekker.domain.task.dto.SkillCountDto;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +31,8 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
+    private final RetrospectiveSkillRepository retrospectiveSkillRepository;
+    private final ProjectRetrospectiveRepository projectRetrospectiveRepository;
 
     @Transactional
     public Long addProject(Long memberId, ProjectReqDto projectReqDto) {
@@ -31,7 +40,7 @@ public class ProjectService {
         Member member = findById(memberId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
-        validateProjectDates(projectReqDto);
+        validateProjectDates(projectReqDto.startDate(), projectReqDto.endDate());
 
         // dto를 Entity로 변경
         Project project = projectReqDto.toEntity(member);
@@ -81,7 +90,7 @@ public class ProjectService {
         Project project = findProjectByIdWithMember(projectId);
 
         // 종료 날짜가 시작 날짜보다 이전인지 검증
-        validateProjectDates(projectReqDto);
+        validateProjectDates(projectReqDto.startDate(), projectReqDto.endDate());
 
         // 회원이 프로젝트 소유자인지 검증
         project.validateOwner(memberId);
@@ -100,6 +109,46 @@ public class ProjectService {
 
         // 프로젝트 삭제
         projectRepository.delete(project);
+    }
+
+    public ProjectSkillSummaryResDto getProjectSkillSummary(Long memberId, Long projectId) {
+        // 회원 및 프로젝트 조회 및 검증
+        Project project = findProjectByIdWithMember(projectId);
+        project.validateOwner(memberId);
+
+        // 상위 3개의 소프트 스킬 반환
+        List<SkillCountDto> topSoftSkills = retrospectiveSkillRepository.findTopSkillsByType(
+                projectId, "소프트", PageRequest.of(0, 3));
+
+        // 상위 3개의 하드 스킬 반환
+        List<SkillCountDto> topHardSkills = retrospectiveSkillRepository.findTopSkillsByType(
+                projectId, "하드", PageRequest.of(0, 3));
+
+        return ProjectSkillSummaryResDto.toDto(project, topSoftSkills, topHardSkills);
+    }
+
+    @Transactional
+    public void closeProject(Long memberId, Long projectId, ProjectRetrospectiveReqDto reqDto) {
+        // 회원 및 프로젝트 조회 및 검증
+        Project project = findProjectByIdWithMember(projectId);
+        project.validateOwner(memberId);
+
+        project.updateCompleted();
+
+        projectRetrospectiveRepository.save(reqDto.toEntity(project));
+    }
+
+    @Transactional
+    public void extendProject(Long memberId, Long projectId, ProjectExtendReqDto reqDto) {
+        // 회원 및 프로젝트 조회 및 검증
+        Project project = findProjectByIdWithMember(projectId);
+        project.validateOwner(memberId);
+
+        // 종료 날짜가 시작 날짜보다 이전인지 검증
+        validateProjectDates(project.getStartDate(), reqDto.endDate());
+
+        // 종료 날짜 업데이트
+        project.updateEndDate(reqDto.endDate());
     }
 
     /**
@@ -132,10 +181,10 @@ public class ProjectService {
     /**
      * 종료날자가 시작 날짜 이전인지 검증
      */
-    private static void validateProjectDates(ProjectReqDto projectReqDto) {
-        if (projectReqDto.endDate() != null) {
-            if (projectReqDto.endDate().isBefore(projectReqDto.startDate())) {
-                throw new BusinessException(projectReqDto.endDate(), "endDate",
+    private static void validateProjectDates(LocalDate startDate, LocalDate endDate) {
+        if (endDate != null) {
+            if (endDate.isBefore(startDate)) {
+                throw new BusinessException(endDate, "endDate",
                         ErrorCode.PROJECT_BAD_REQUEST);
             }
         }

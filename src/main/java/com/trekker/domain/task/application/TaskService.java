@@ -176,8 +176,8 @@ public class TaskService {
             if (project.getEndDate() != null && endDate.isAfter(project.getEndDate())) {
                 throw new BusinessException(endDate, "endDate", ErrorCode.TASK_BAD_REQUEST);
             }
-            // 종료일이 시작일보다 빠른 경우 예외 발생
-            if (endDate.isBefore(startDate)) {
+            // 종료일이 시작일보다 빠르거나 같은 경우 예외 발생
+            if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
                 throw new BusinessException(endDate, "endDate", ErrorCode.TASK_BAD_REQUEST);
             }
         }

@@ -2,6 +2,8 @@ package com.trekker.domain.calender.application;
 
 import com.trekker.domain.calender.dto.res.MonthlyTaskSummaryDto;
 import com.trekker.domain.task.dao.TaskRepository;
+import com.trekker.domain.task.dto.res.TaskResDto;
+import com.trekker.domain.task.entity.Task;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +33,21 @@ public class CalenderService {
         return taskRepository.getMonthlyTaskSummary(memberId, startOfMonth, endOfMonth);
     }
 
+    /**
+     * 오늘의 할 일을 조회합니다.
+     * @param memberId 조회할 회원의 ID
+     * @return 오늘 날짜 기준 사용자의 할 일
+     */
+    public List<TaskResDto> getTodayTasks(Long memberId) {
+        // 오늘 날짜 계산
+        LocalDate today = LocalDate.now();
+
+        // 오늘의 할 일 목록 조회
+        List<Task> tasksForToday = taskRepository.findTasksForToday(memberId, today);
+
+        // DTO로 변환 및 반환
+        return tasksForToday.stream()
+                .map(TaskResDto::toDto)
+                .toList();
+    }
 }

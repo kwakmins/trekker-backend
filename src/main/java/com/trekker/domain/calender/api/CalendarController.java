@@ -2,6 +2,7 @@ package com.trekker.domain.calender.api;
 
 import com.trekker.domain.calender.application.CalenderService;
 import com.trekker.domain.calender.dto.res.MonthlyTaskSummaryDto;
+import com.trekker.domain.task.dto.res.TaskResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,14 @@ public class CalendarController {
         List<MonthlyTaskSummaryDto> calendar = calenderService.getMonthlyCalender(memberId, year,
                 month);
         return ResponseEntity.ok(calendar);
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<List<TaskResDto>> getTodayTask(
+            @LoginMember Long memberId
+    ) {
+        List<TaskResDto> todayTasks = calenderService.getTodayTasks(memberId);
+        return ResponseEntity.ok(todayTasks);
     }
 
 }

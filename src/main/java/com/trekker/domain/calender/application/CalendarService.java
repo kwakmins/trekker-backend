@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CalenderService {
+public class CalendarService {
 
     private final TaskRepository taskRepository;
 
@@ -24,7 +24,7 @@ public class CalenderService {
      * @param memberId 사용자의 Id
      * @return 월간 데이터와 날짜별 할 일 리스트
      */
-    public List<MonthlyTaskSummaryDto> getMonthlyCalender(Long memberId, int year, int month) {
+    public List<MonthlyTaskSummaryDto> getMonthlyCalendar(Long memberId, int year, int month) {
         // 월의 시작일과 종료일 계산
         LocalDate startOfMonth = LocalDate.of(year,month,1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());

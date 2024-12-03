@@ -1,7 +1,6 @@
 package com.trekker.domain.calender.application;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.trekker.domain.calender.dto.res.MonthlyTaskSummaryDto;
@@ -10,7 +9,6 @@ import com.trekker.domain.task.dto.res.TaskResDto;
 import com.trekker.domain.task.entity.Task;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,10 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class CalenderServiceTest {
+class CalendarServiceTest {
 
     @InjectMocks
-    CalenderService calenderService;
+    CalendarService calendarService;
     @Mock
     TaskRepository taskRepository;
 
@@ -46,7 +44,7 @@ class CalenderServiceTest {
                 mockTasks);
 
         // when
-        List<MonthlyTaskSummaryDto> result = calenderService.getMonthlyCalender(memberId, year,
+        List<MonthlyTaskSummaryDto> result = calendarService.getMonthlyCalendar(memberId, year,
                 month);
 
         // then
@@ -79,7 +77,7 @@ class CalenderServiceTest {
         when(taskRepository.findTasksForToday(memberId, today)).thenReturn(taskList);
 
         // when
-        List<TaskResDto> result = calenderService.getTodayTasks(memberId);
+        List<TaskResDto> result = calendarService.getTodayTasks(memberId);
 
         //then
         assertThat(result).isNotNull();

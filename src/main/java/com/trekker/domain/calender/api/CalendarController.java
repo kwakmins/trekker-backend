@@ -1,6 +1,6 @@
 package com.trekker.domain.calender.api;
 
-import com.trekker.domain.calender.application.CalenderService;
+import com.trekker.domain.calender.application.CalendarService;
 import com.trekker.domain.calender.dto.res.MonthlyTaskSummaryDto;
 import com.trekker.domain.task.dto.res.TaskResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CalendarController {
 
-    private final CalenderService calenderService;
+    private final CalendarService calendarService;
 
     @GetMapping("/month")
     public ResponseEntity<List<MonthlyTaskSummaryDto>> getMonthlyCalendar(
             @LoginMember Long memberId,
             @RequestParam int year, @RequestParam int month) {
 
-        List<MonthlyTaskSummaryDto> calendar = calenderService.getMonthlyCalender(memberId, year,
+        List<MonthlyTaskSummaryDto> calendar = calendarService.getMonthlyCalendar(memberId, year,
                 month);
         return ResponseEntity.ok(calendar);
     }
@@ -33,7 +33,7 @@ public class CalendarController {
     public ResponseEntity<List<TaskResDto>> getTodayTask(
             @LoginMember Long memberId
     ) {
-        List<TaskResDto> todayTasks = calenderService.getTodayTasks(memberId);
+        List<TaskResDto> todayTasks = calendarService.getTodayTasks(memberId);
         return ResponseEntity.ok(todayTasks);
     }
 

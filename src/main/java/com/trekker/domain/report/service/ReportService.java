@@ -33,7 +33,7 @@ public class ReportService {
      * 회원의 보고서를 반환합니다
      *
      * @param memberId 회원의 ID
-     * @return 상위 소프트/하드 스킬, 이번 달의 날짜별 진행률, 주간 완료된 작업 수를 계산한 데이터를 담는 DTO
+     * @return 상위 소프트/하드 스킬, 이번 달의 날짜별 진행률, 주간 완료된 할 일 수를 계산한 데이터를 담는 DTO
      */
     public ReportResDto getMemberReport(Long memberId) {
 
@@ -45,15 +45,15 @@ public class ReportService {
         List<SkillCountDto> topHardSkills = retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(
                 memberId, HARD_SKILL, PageRequest.of(0, 3));
 
-        // 이번 달의 날짜별 작업 통계 계산
+        // 이번 달의 날짜별 할 일 통계 계산
         Map<LocalDate, Map<String, Integer>> dailyTaskStatsInMonth = getDailyTaskStatsInMonth(
                 memberId);
 
-        // 이번 달의 날짜별 작업 진행률 계산
+        // 이번 달의 날짜별 할 일 진행률 계산
         Map<LocalDate, Integer> monthlyTaskRate = ProgressRateUtil.calculateProgressRate(
                 dailyTaskStatsInMonth);
 
-        // 이번 주의 일별 완료된 작업 수 계산
+        // 이번 주의 일별 완료된 할 일 수 계산
         Map<LocalDate, Integer> weeklyTaskCounts = getLastWeekToThisSaturdayTasks(
                 dailyTaskStatsInMonth);
 
@@ -72,10 +72,10 @@ public class ReportService {
     }
 
     /**
-     * 회원의 작업 데이터를 기반으로 이번 달의 날짜별 작업 통계를 반환합니다.
+     * 회원의 할 일 데이터를 기반으로 이번 달의 날짜별 할 일 통계를 반환합니다.
      *
      * @param memberId 회원 ID
-     * @return 날짜별 작업 통계 (전체 작업 수와 완료된 작업 수 포함)
+     * @return 날짜별 할 일 통계 (전체 할 일 수와 완료된 할 일 수 포함)
      */
     private Map<LocalDate, Map<String, Integer>> getDailyTaskStatsInMonth(Long memberId) {
         // 이번 달의 시작일과 종료일 계산
@@ -83,20 +83,20 @@ public class ReportService {
         LocalDate startOfMonth = LocalDate.of(now.getYear(), now.getMonth(), 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-        // 회원의 이번 달 작업 데이터를 조회
+        // 회원의 이번 달 할 일 데이터를 조회
         List<Task> tasks = taskRepository.findTasksInMonth(memberId, startOfMonth, endOfMonth);
 
-        // 작업 데이터를 날짜별로 집계하여 통계를 생성
+        // 할 일 데이터를 날짜별로 집계하여 통계를 생성
         return calculateDailyStats(tasks, startOfMonth, endOfMonth);
     }
 
     /**
-     * 작업 데이터를 날짜별로 집계하여 작업 통계를 생성합니다.
+     * 할 일 데이터를 날짜별로 집계하여 할 일 통계를 생성합니다.
      *
-     * @param tasks        작업 리스트
+     * @param tasks        할 일 리스트
      * @param startOfMonth 이번 달의 시작일
      * @param endOfMonth   이번 달의 종료일
-     * @return 날짜별 작업 통계 (전체 작업 수와 완료된 작업 수 포함)
+     * @return 날짜별 할 일 통계 (전체 할 일 수와 완료된 할 일 수 포함)
      */
     private Map<LocalDate, Map<String, Integer>> calculateDailyStats(
             List<Task> tasks, LocalDate startOfMonth, LocalDate endOfMonth) {
@@ -104,21 +104,21 @@ public class ReportService {
         Map<LocalDate, Map<String, Integer>> dailyStats = new HashMap<>();
 
         for (Task task : tasks) {
-            // 작업 기간을 이번 달의 범위로 조정
+            // 할 일 기간을 이번 달의 범위로 조정
             LocalDate current =
                     task.getStartDate().isBefore(startOfMonth) ? startOfMonth : task.getStartDate();
             LocalDate end = (task.getEndDate() == null || task.getEndDate().isAfter(endOfMonth))
                     ? endOfMonth : task.getEndDate();
 
-            // 작업 기간 동안 날짜별로 작업 통계를 갱신
+            // 할 일 기간 동안 날짜별로 할 일 통계를 갱신
             while (!current.isAfter(end)) {
                 dailyStats.putIfAbsent(current, new HashMap<>());
                 Map<String, Integer> stats = dailyStats.get(current);
 
-                // 전체 작업 수 갱신
+                // 전체 할 일 수 갱신
                 stats.put(TOTAL_TASK, stats.getOrDefault(TOTAL_TASK, 0) + 1);
 
-                // 완료된 작업 수 갱신
+                // 완료된 할 일 수 갱신
                 if (task.getIsCompleted()) {
                     stats.put(COMPLETED_TASK, stats.getOrDefault(COMPLETED_TASK, 0) + 1);
                 }
@@ -131,10 +131,10 @@ public class ReportService {
     }
 
     /**
-     * 주어진 일별 작업 통계에서 저번 주 일요일부터 이번 주 토요일까지의 작업 데이터를 필터링합니다.
+     * 주어진 일별 할 일 통계에서 저번 주 일요일부터 이번 주 토요일까지의 할 일 데이터를 필터링합니다.
      *
-     * @param dailyTaskStats 날짜 별 작업 통계
-     * @return 저번 주 일요일부터 이번 주 토요일까지의 날짜별 완료된 작업 수 맵
+     * @param dailyTaskStats 날짜 별 할 일 통계
+     * @return 저번 주 일요일부터 이번 주 토요일까지의 날짜별 완료된 할 일 수 맵
      */
     private Map<LocalDate, Integer> getLastWeekToThisSaturdayTasks(
             Map<LocalDate, Map<String, Integer>> dailyTaskStats) {
@@ -145,7 +145,7 @@ public class ReportService {
         LocalDate lastSunday = now.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
         LocalDate thisSaturday = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
 
-        // 주어진 작업 통계에서 해당 주 범위의 데이터를 필터링
+        // 주어진 할 일 통계에서 해당 주 범위의 데이터를 필터링
         for (Map.Entry<LocalDate, Map<String, Integer>> entry : dailyTaskStats.entrySet()) {
             LocalDate date = entry.getKey();
             if (!date.isBefore(lastSunday) && !date.isAfter(thisSaturday)) {

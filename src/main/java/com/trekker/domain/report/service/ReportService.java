@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +22,8 @@ public class ReportService {
 
     private static final String SOFT_SKILL = "소프트";
     private static final String HARD_SKILL = "하드";
+    private static final String TOTAL_TASK = "totalTasks";
+    private static final String COMPLETED_TASK = "completedTasks";
 
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
     private final TaskRepository taskRepository;
@@ -30,6 +31,7 @@ public class ReportService {
 
     /**
      * 회원의 보고서를 반환합니다
+     *
      * @param memberId 회원의 ID
      * @return 상위 소프트/하드 스킬, 이번 달의 날짜별 진행률, 주간 완료된 작업 수를 계산한 데이터를 담는 DTO
      */
@@ -58,54 +60,70 @@ public class ReportService {
         return new ReportResDto(topSoftSkills, topHardSkills, monthlyTaskRate, weeklyTaskCounts);
     }
 
+    /**
+     * 회원의 스킬을 조회합니다.
+     *
+     * @param memberId 회원의 ID
+     * @param type     조회할 스킬 유형 (소프트, 하드)
+     * @return 조회한 스킬 리스트
+     */
     public List<SkillCountDto> getMemberSkillList(Long memberId, String type) {
         return retrospectiveSkillRepository.findSkillsByMemberIdAndType(memberId, type);
     }
 
     /**
-     * 이번 달의 날짜별 전체 작업 및 완료된 작업 통계를 가져옵니다.
+     * 회원의 작업 데이터를 기반으로 이번 달의 날짜별 작업 통계를 반환합니다.
      *
-     * @param memberId 멤버 ID
-     * @return 날짜별 작업 통계 (전체 작업 수, 완료된 작업 수)
+     * @param memberId 회원 ID
+     * @return 날짜별 작업 통계 (전체 작업 수와 완료된 작업 수 포함)
      */
     private Map<LocalDate, Map<String, Integer>> getDailyTaskStatsInMonth(Long memberId) {
-        Map<LocalDate, Map<String, Integer>> dailyStats = new HashMap<>();
-
-        // 현재 날짜를 기준으로 이번 달의 시작일과 종료일 계산
+        // 이번 달의 시작일과 종료일 계산
         LocalDate now = LocalDate.now();
         LocalDate startOfMonth = LocalDate.of(now.getYear(), now.getMonth(), 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-        // 멤버의 이번 달 작업 조회
+        // 회원의 이번 달 작업 데이터를 조회
         List<Task> tasks = taskRepository.findTasksInMonth(memberId, startOfMonth, endOfMonth);
 
-        // 작업의 날짜별 전체 및 완료된 작업 수 계산
+        // 작업 데이터를 날짜별로 집계하여 통계를 생성
+        return calculateDailyStats(tasks, startOfMonth, endOfMonth);
+    }
+
+    /**
+     * 작업 데이터를 날짜별로 집계하여 작업 통계를 생성합니다.
+     *
+     * @param tasks        작업 리스트
+     * @param startOfMonth 이번 달의 시작일
+     * @param endOfMonth   이번 달의 종료일
+     * @return 날짜별 작업 통계 (전체 작업 수와 완료된 작업 수 포함)
+     */
+    private Map<LocalDate, Map<String, Integer>> calculateDailyStats(
+            List<Task> tasks, LocalDate startOfMonth, LocalDate endOfMonth) {
+
+        Map<LocalDate, Map<String, Integer>> dailyStats = new HashMap<>();
+
         for (Task task : tasks) {
-            // 작업 기간 계산
-            LocalDate startDate = task.getStartDate();
-            LocalDate endDate = (task.getEndDate() != null) ? task.getEndDate() : startDate;
+            // 작업 기간을 이번 달의 범위로 조정
+            LocalDate current =
+                    task.getStartDate().isBefore(startOfMonth) ? startOfMonth : task.getStartDate();
+            LocalDate end = (task.getEndDate() == null || task.getEndDate().isAfter(endOfMonth))
+                    ? endOfMonth : task.getEndDate();
 
-            // 작업 기간을 이번 달 범위 내로 제한
-            LocalDate current = startDate.isBefore(startOfMonth) ? startOfMonth : startDate;
-            LocalDate end = endDate.isAfter(endOfMonth) ? endOfMonth : endDate;
-
-            // 작업 기간 동안 각 날짜별 작업 수 계산
+            // 작업 기간 동안 날짜별로 작업 통계를 갱신
             while (!current.isAfter(end)) {
-                // 작업이 완료된 경우, 완료된 작업 수를 증가시킴
                 dailyStats.putIfAbsent(current, new HashMap<>());
-
                 Map<String, Integer> stats = dailyStats.get(current);
 
-                // 전체 작업 수를 증가시킴
-                stats.put("totalTasks", stats.getOrDefault("totalTasks", 0) + 1);
+                // 전체 작업 수 갱신
+                stats.put(TOTAL_TASK, stats.getOrDefault(TOTAL_TASK, 0) + 1);
 
-                // 작업이 완료된 경우, 완료된 작업 수를 증가시킴
+                // 완료된 작업 수 갱신
                 if (task.getIsCompleted()) {
-                    stats.put("completedTasks", stats.getOrDefault("completedTasks", 0) + 1);
+                    stats.put(COMPLETED_TASK, stats.getOrDefault(COMPLETED_TASK, 0) + 1);
                 }
 
-                // 다음 날짜로 이동
-                current = current.plusDays(1);
+                current = current.plusDays(1); // 다음 날짜로 이동
             }
         }
 
@@ -131,7 +149,7 @@ public class ReportService {
         for (Map.Entry<LocalDate, Map<String, Integer>> entry : dailyTaskStats.entrySet()) {
             LocalDate date = entry.getKey();
             if (!date.isBefore(lastSunday) && !date.isAfter(thisSaturday)) {
-                int completedTasks = entry.getValue().getOrDefault("completedTasks", 0);
+                int completedTasks = entry.getValue().getOrDefault(COMPLETED_TASK, 0);
                 weeklyCompletedTasks.put(date, completedTasks);
             }
         }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * 진행률은 완료된 작업 수를 기준으로 계산되며, 사전 정의된 구간 값으로 반환됩니다.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ProgressRateUtil {
+public class ProgressRateCalculator {
 
     private static final int PROGRESS_20 = 20;
     private static final int PROGRESS_40 = 40;

@@ -1,7 +1,7 @@
 package com.trekker.domain.report.service;
 
 import com.trekker.domain.report.dto.ReportResDto;
-import com.trekker.domain.report.util.ProgressRateUtil;
+import com.trekker.domain.report.util.ProgressRateCalculator;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
 import com.trekker.domain.task.dao.TaskRepository;
 import com.trekker.domain.task.dto.SkillCountDto;
@@ -50,14 +50,15 @@ public class ReportService {
                 memberId);
 
         // 이번 달의 날짜별 할 일 진행률 계산
-        Map<LocalDate, Integer> monthlyTaskRate = ProgressRateUtil.calculateProgressRate(
+        Map<LocalDate, Integer> dailyProgressRatesInMonth = ProgressRateCalculator.calculateProgressRate(
                 dailyTaskStatsInMonth);
 
         // 이번 주의 일별 완료된 할 일 수 계산
         Map<LocalDate, Integer> weeklyTaskCounts = getLastWeekToThisSaturdayTasks(
                 dailyTaskStatsInMonth);
 
-        return new ReportResDto(topSoftSkills, topHardSkills, monthlyTaskRate, weeklyTaskCounts);
+        return new ReportResDto(topSoftSkills, topHardSkills, dailyProgressRatesInMonth,
+                weeklyTaskCounts);
     }
 
     /**
@@ -104,11 +105,14 @@ public class ReportService {
         Map<LocalDate, Map<String, Integer>> dailyStats = new HashMap<>();
 
         for (Task task : tasks) {
+            // 종료일이 없을 경우 endDate를 startDate 로 설정
+            LocalDate endDate =
+                    (task.getEndDate() != null) ? task.getEndDate() : task.getStartDate();
+
             // 할 일 기간을 이번 달의 범위로 조정
             LocalDate current =
                     task.getStartDate().isBefore(startOfMonth) ? startOfMonth : task.getStartDate();
-            LocalDate end = (task.getEndDate() == null || task.getEndDate().isAfter(endOfMonth))
-                    ? endOfMonth : task.getEndDate();
+            LocalDate end = endDate.isAfter(endOfMonth) ? endOfMonth : endDate;
 
             // 할 일 기간 동안 날짜별로 할 일 통계를 갱신
             while (!current.isAfter(end)) {

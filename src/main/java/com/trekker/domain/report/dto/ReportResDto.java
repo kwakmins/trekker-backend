@@ -11,7 +11,7 @@ public record ReportResDto(
         List<SkillCountDto> hardSkillList,
 
         //월 별 진행률
-        Map<LocalDate, Integer> monthlyTaskRate,
+        Map<LocalDate, Integer> dailyProgressRatesInMonth,
         // 주간 작업 완료 횟수
         Map<LocalDate, Integer> weeklyCompletedTasks
 ) {

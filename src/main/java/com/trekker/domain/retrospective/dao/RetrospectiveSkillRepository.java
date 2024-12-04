@@ -24,5 +24,20 @@ public interface RetrospectiveSkillRepository extends JpaRepository<Retrospectiv
             @Param("type") String type,
             Pageable pageable);
 
+    @Query("""
+           SELECT new com.trekker.domain.task.dto.SkillCountDto(rs.skill.name, COUNT(rs.skill.name))
+           FROM RetrospectiveSkill rs
+           JOIN rs.retrospective r
+           JOIN r.task t
+           JOIN t.project p
+           JOIN p.member m
+           WHERE m.id = :memberId AND rs.type = :type
+           GROUP BY rs.skill.name
+           ORDER BY COUNT(rs.skill.name) DESC
+           """)
+    List<SkillCountDto> findTopSkillsByMemberIdAndType(@Param("memberId") Long memberId,
+            @Param("type") String type,
+            Pageable pageable);
+
 
 }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -69,7 +70,8 @@ public class ReportService {
      * @return 조회한 스킬 리스트
      */
     public List<SkillCountDto> getMemberSkillList(Long memberId, String type) {
-        return retrospectiveSkillRepository.findSkillsByMemberIdAndType(memberId, type);
+        return retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, type,
+                Pageable.unpaged());
     }
 
     /**

@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -110,7 +111,7 @@ class ReportServiceTest {
     void getMemberSkillList() {
         // given
         String type = "하드";
-        when(retrospectiveSkillRepository.findSkillsByMemberIdAndType(memberId, type)).thenReturn(
+        when(retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, type, Pageable.unpaged())).thenReturn(
                 mockHardSkillList);
 
         // when

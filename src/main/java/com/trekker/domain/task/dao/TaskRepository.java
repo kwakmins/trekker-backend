@@ -76,4 +76,20 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                )
        """)
     List<Task> findTasksForToday(@Param("memberId") Long memberId, @Param("today") LocalDate today);
+
+
+    @Query("""
+           SELECT t
+           FROM Task t
+           JOIN FETCH t.project p
+           JOIN FETCH p.member m
+           LEFT JOIN FETCH t.retrospective
+           WHERE m.id =:memberId
+           AND (
+                (t.endDate IS NULL AND t.startDate BETWEEN :startOfMonth AND :endOfMonth) OR
+                (t.endDate IS NOT NULL AND t.endDate >=:startOfMonth AND t.startDate <= :endOfMonth)
+               )
+           """)
+    List<Task> findTasksInMonth(@Param("memberId") Long memberId, @Param("startOfMonth") LocalDate startOfMonth,
+    @Param("endOfMonth") LocalDate endOfMonth);
 }

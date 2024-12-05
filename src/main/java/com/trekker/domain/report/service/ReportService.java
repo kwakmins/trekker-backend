@@ -8,10 +8,13 @@ import com.trekker.domain.task.dto.SkillCountDto;
 import com.trekker.domain.task.entity.Task;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -104,37 +107,57 @@ public class ReportService {
     private Map<LocalDate, Map<String, Integer>> calculateDailyStats(
             List<Task> tasks, LocalDate startOfMonth, LocalDate endOfMonth) {
 
-        Map<LocalDate, Map<String, Integer>> dailyStats = new HashMap<>();
+        return tasks.stream()
+                .flatMap(task -> {
+                    // 종료일이 없을 경우 endDate를 startDate로 설정
+                    LocalDate endDate =
+                            (task.getEndDate() != null) ? task.getEndDate() : task.getStartDate();
 
-        for (Task task : tasks) {
-            // 종료일이 없을 경우 endDate를 startDate 로 설정
-            LocalDate endDate =
-                    (task.getEndDate() != null) ? task.getEndDate() : task.getStartDate();
+                    // 할 일 기간을 이번 달의 범위로 조정
+                    LocalDate currentStart =
+                            task.getStartDate().isBefore(startOfMonth) ? startOfMonth
+                                    : task.getStartDate();
+                    LocalDate currentEnd = endDate.isAfter(endOfMonth) ? endOfMonth : endDate;
 
-            // 할 일 기간을 이번 달의 범위로 조정
-            LocalDate current =
-                    task.getStartDate().isBefore(startOfMonth) ? startOfMonth : task.getStartDate();
-            LocalDate end = endDate.isAfter(endOfMonth) ? endOfMonth : endDate;
-
-            // 할 일 기간 동안 날짜별로 할 일 통계를 갱신
-            while (!current.isAfter(end)) {
-                dailyStats.putIfAbsent(current, new HashMap<>());
-                Map<String, Integer> stats = dailyStats.get(current);
-
-                // 전체 할 일 수 갱신
-                stats.put(TOTAL_TASK, stats.getOrDefault(TOTAL_TASK, 0) + 1);
-
-                // 완료된 할 일 수 갱신
-                if (task.getIsCompleted()) {
-                    stats.put(COMPLETED_TASK, stats.getOrDefault(COMPLETED_TASK, 0) + 1);
-                }
-
-                current = current.plusDays(1); // 다음 날짜로 이동
-            }
-        }
-
-        return dailyStats;
+                    // 날짜 범위 스트림 생성
+                    long daysBetween = ChronoUnit.DAYS.between(currentStart, currentEnd) + 1;
+                    return (daysBetween > 0) ?
+                            getDateRangeStream(currentStart, currentEnd).map(
+                                    date -> Map.entry(date, task))
+                            : Stream.empty();
+                })
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey, // 날짜별로 그룹화
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                entries -> {
+                                    Map<String, Integer> stats = new HashMap<>();
+                                    stats.put(TOTAL_TASK, entries.size()); // 전체 할 일 수
+                                    stats.put(COMPLETED_TASK,
+                                            (int) entries.stream()
+                                                    .filter(entry -> entry.getValue()
+                                                            .getIsCompleted())
+                                                    .count()); // 완료된 할 일 수
+                                    return stats;
+                                }
+                        )
+                ));
     }
+
+    /**
+     * 주어진 시작일과 종료일 사이의 날짜 스트림을 생성합니다.
+     *
+     * @param start 시작일
+     * @param end   종료일
+     * @return 시작일부터 종료일까지의 LocalDate 스트림
+     */
+    private Stream<LocalDate> getDateRangeStream(LocalDate start, LocalDate end) {
+        long daysBetween = ChronoUnit.DAYS.between(start, end) + 1;
+        return Stream.iterate(start, date -> date.plusDays(1))
+                .limit(daysBetween);
+    }
+
+
 
     /**
      * 주어진 일별 할 일 통계에서 저번 주 일요일부터 이번 주 토요일까지의 할 일 데이터를 필터링합니다.
@@ -144,7 +167,6 @@ public class ReportService {
      */
     private Map<LocalDate, Integer> getLastWeekToThisSaturdayTasks(
             Map<LocalDate, Map<String, Integer>> dailyTaskStats) {
-        Map<LocalDate, Integer> weeklyCompletedTasks = new HashMap<>();
 
         // 현재 날짜를 기준으로 저번 주 일요일과 이번 주 토요일 계산
         LocalDate now = LocalDate.now();
@@ -152,15 +174,13 @@ public class ReportService {
         LocalDate thisSaturday = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
 
         // 주어진 할 일 통계에서 해당 주 범위의 데이터를 필터링
-        for (Map.Entry<LocalDate, Map<String, Integer>> entry : dailyTaskStats.entrySet()) {
-            LocalDate date = entry.getKey();
-            if (!date.isBefore(lastSunday) && !date.isAfter(thisSaturday)) {
-                int completedTasks = entry.getValue().getOrDefault(COMPLETED_TASK, 0);
-                weeklyCompletedTasks.put(date, completedTasks);
-            }
-        }
-
-        return weeklyCompletedTasks;
+        return dailyTaskStats.entrySet().stream()
+                .filter(entry -> !entry.getKey().isBefore(lastSunday) && !entry.getKey()
+                        .isAfter(thisSaturday))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getOrDefault(COMPLETED_TASK, 0)
+                ));
     }
 
 }

@@ -21,12 +21,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Optional<Project> findProjectByIdWIthMember(@Param("projectId") Long projectId);
 
     @Query("""
-                SELECT p
-                FROM Project p
-                WHERE p.member.id = :memberId
-                AND p.isCompleted = false
-                AND (:type IS NULL OR p.type = :type)
-            """)
+           SELECT p
+           FROM Project p
+           WHERE p.member.id = :memberId
+           AND p.isCompleted = false
+           AND (:type IS NULL OR p.type = :type)
+           """)
     List<Project> findFilteredProjects(@Param("memberId") Long memberId,
             @Param("type") String type);
 
@@ -39,6 +39,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             FROM Project p
             JOIN p.taskList t
             WHERE p.member.id = :memberId AND t.isCompleted = true
+            GROUP BY p.id, p.title
             """)
     List<ProjectWithTaskCompletedList> findProjectWithTaskCompleted(
             @Param("memberId") Long memberId);

@@ -36,4 +36,8 @@ public class Job {
                 .jobName(jobName)
                 .build();
     }
+
+    public void updateJobName(String jobName) {
+        this.jobName = jobName;
+    }
 }

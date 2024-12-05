@@ -1,4 +1,4 @@
-package com.trekker.domain.member.dto;
+package com.trekker.domain.member.dto.req;
 
 import com.trekker.domain.project.dto.req.ProjectReqDto;
 import jakarta.validation.constraints.NotNull;

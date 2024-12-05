@@ -4,7 +4,8 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import com.trekker.domain.member.dto.OnboardingReqDto;
+import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
+import com.trekker.domain.member.dto.req.OnboardingReqDto;
 import com.trekker.domain.project.entity.Project;
 import com.trekker.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -44,6 +45,9 @@ public class Member extends BaseEntity {
     @Column(name = "name", length = MAX_NAME_LENGTH)
     private String name;
 
+    @Column(name = "profile_image", length = 512)
+    private String profileImage;
+
     @OneToOne(fetch = LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "social_provider_id")
     private SocialProvider socialProvider;
@@ -61,12 +65,13 @@ public class Member extends BaseEntity {
 
 
     @Builder
-    public Member(Long id, String email, Role role, String name, SocialProvider socialProvider,
+    public Member(Long id, String email, Role role, String name,String profileImage, SocialProvider socialProvider,
             Job job, Onboarding onboarding, List<Project> projectList) {
         this.id = id;
         this.email = email;
         this.role = role;
         this.name = name;
+        this.profileImage = profileImage;
         this.job = job;
         this.onboarding = onboarding;
         this.socialProvider = socialProvider;
@@ -94,5 +99,14 @@ public class Member extends BaseEntity {
             this.projectList.add(project);
         }
         onboarding.updateCompleted();
+    }
+
+    public void updateMember(MemberUpdateReqDto reqDto) {
+        this.name = reqDto.name();
+        this.job.updateJobName(reqDto.jobName());
+    }
+
+    public void updateProfileImage(String profileImagePath) {
+        this.profileImage = profileImagePath;
     }
 }

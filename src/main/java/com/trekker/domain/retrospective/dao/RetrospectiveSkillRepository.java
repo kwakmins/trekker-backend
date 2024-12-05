@@ -1,5 +1,6 @@
 package com.trekker.domain.retrospective.dao;
 
+import com.trekker.domain.project.dto.ProjectSkillDto;
 import com.trekker.domain.retrospective.entity.RetrospectiveSkill;
 import com.trekker.domain.task.dto.SkillCountDto;
 import java.util.List;
@@ -39,5 +40,26 @@ public interface RetrospectiveSkillRepository extends JpaRepository<Retrospectiv
             @Param("type") String type,
             Pageable pageable);
 
+    @Query("""
+       SELECT new com.trekker.domain.project.dto.ProjectSkillDto(
+           p.id,
+           p.title,
+           p.description,
+           p.startDate,
+           p.endDate,
+           rs.type,
+           rs.skill.name,
+           COUNT(rs.skill.name)
+       )
+       FROM RetrospectiveSkill rs
+       JOIN rs.retrospective r
+       JOIN r.task t
+       JOIN t.project p
+       JOIN p.member m
+       WHERE m.id = :memberId
+       GROUP BY p.id, p.title, p.description, p.startDate, p.endDate, rs.type, rs.skill.name
+       ORDER BY p.id, rs.type, COUNT(rs.skill.name) DESC
+       """)
+    List<ProjectSkillDto> findProjectSkillsByMemberId(@Param("memberId") Long memberId);
 
 }

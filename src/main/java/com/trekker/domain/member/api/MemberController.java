@@ -5,10 +5,12 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.trekker.domain.member.application.MemberService;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
+import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +24,12 @@ public class MemberController {
 
     private final MemberService memberService;
 
+
+    @GetMapping("/portfolio")
+    public ResponseEntity<MemberPortfolioResDto> getPortfolio(@LoginMember Long id) {
+        MemberPortfolioResDto portfolio = memberService.getPortfolio(id);
+        return ResponseEntity.ok(portfolio);
+    }
     @PostMapping("/onboarding")
     public ResponseEntity<Void> onBoarding(@LoginMember Long id,
             @Valid @RequestBody OnboardingReqDto onboardingReqDto) {

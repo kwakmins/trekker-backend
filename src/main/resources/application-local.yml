@@ -31,3 +31,6 @@ decorator:
   datasource:
     p6spy:
       enable-logging: true
+
+file:
+  dir: ${FILE_DIR}

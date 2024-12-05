@@ -33,6 +33,7 @@ public class MemberService {
 
     /**
      * 회원의 정보를 조회합니다
+     *
      * @param memberId 회원의 Id
      * @return 회원의 이름, 직무, 프로필 경로 가 담긴 DTO
      */
@@ -89,7 +90,8 @@ public class MemberService {
         Member member = findByIdWithJob(memberId);
 
         // 회원의 프로젝트 스킬 데이터 조회
-        List<ProjectSkillDto> skillDto = retrospectiveSkillRepository.findProjectSkillsByMemberId(memberId);
+        List<ProjectSkillDto> skillDto = retrospectiveSkillRepository.findProjectSkillsByMemberId(
+                memberId);
 
         // 프로젝트별 상위 스킬 데이터를 가공
         List<ProjectSkillResDto> projectSkillResDto = groupAndTransformProjectSkills(skillDto);

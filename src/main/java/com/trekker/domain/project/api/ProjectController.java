@@ -8,9 +8,12 @@ import com.trekker.domain.project.dto.req.ProjectExtendReqDto;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.domain.project.dto.req.ProjectRetrospectiveReqDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
+import com.trekker.domain.project.dto.res.ProjectWithTaskCompletedList;
 import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
+import com.trekker.domain.task.dto.res.TaskRetrospectiveResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +52,24 @@ public class ProjectController {
         ProjectWithMemberInfoResDto resDto = projectService.getProjectList(memberId, type);
 
         return ResponseEntity.ok(resDto);
+    }
+
+    @GetMapping("/retrospective")
+    public ResponseEntity<List<ProjectWithTaskCompletedList>> getTotalRetrospectivesProject(
+            @LoginMember Long memberId) {
+        List<ProjectWithTaskCompletedList> totalRetrospectives =
+                projectService.getTotalRetrospectivesProject(memberId);
+
+        return ResponseEntity.ok((totalRetrospectives));
+    }
+
+    @GetMapping("/retrospective/{projectId}")
+    public ResponseEntity<List<TaskRetrospectiveResDto>> getRetrospectivesProject(
+            @LoginMember Long memberId, @PathVariable Long projectId) {
+        List<TaskRetrospectiveResDto> projectRetrospectiveList = projectService.getProjectRetrospectiveList(
+                memberId, projectId);
+
+        return ResponseEntity.ok((projectRetrospectiveList));
     }
 
 

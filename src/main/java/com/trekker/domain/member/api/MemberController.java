@@ -9,6 +9,7 @@ import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
 import com.trekker.domain.member.dto.res.MemberResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping
+    @GetMapping("/profile")
     public ResponseEntity<MemberResDto> getMember(@LoginMember Long memberId) {
         MemberResDto member = memberService.getMember(memberId);
 
@@ -46,7 +47,7 @@ public class MemberController {
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
-    @GetMapping("/portfolio")
+    @GetMapping("/profile/portfolio")
     public ResponseEntity<MemberPortfolioResDto> getPortfolio(@LoginMember Long memberId) {
         MemberPortfolioResDto portfolio = memberService.getPortfolio(memberId);
         return ResponseEntity.ok(portfolio);

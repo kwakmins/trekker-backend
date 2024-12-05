@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileService {
 
     // 업로드된 파일이 제공될 URL의 공통 경로 (리소스 핸들러와 매핑)
-    private static final String MAPPING_URL = "/uploads/profile-images/";
+    private static final String FILE_PATH = "/uploads/profile-images/";
+    // 허용 확장자
+    private static final List<String> ALLOWED_FILE_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
 
     // 파일 저장소의 실제 경로
     private final Path fileStorageLocation;
@@ -45,7 +48,7 @@ public class FileService {
 
             // 파일 확장자 검증
             String fileExtension = StringUtils.getFilenameExtension(originalFileName).toLowerCase();
-            if (!fileExtension.matches("jpg|jpeg|png|gif")) {
+            if (!ALLOWED_FILE_EXTENSIONS.contains(fileExtension)) {
                 throw new BusinessException(fileExtension, "fileExtension", ErrorCode.MEMBER_FILE_BAD_REQUEST);
             }
 
@@ -58,7 +61,7 @@ public class FileService {
             // 파일 저장 (기존 파일이 있으면 덮어쓰기)
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            return MAPPING_URL + newFileName;
+            return FILE_PATH + newFileName;
 
         } catch (IOException ex) {
             // 파일 저장 실패 시 예외 발생

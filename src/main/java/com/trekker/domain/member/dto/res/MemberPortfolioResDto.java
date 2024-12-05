@@ -9,9 +9,9 @@ import lombok.Builder;
 public record MemberPortfolioResDto (
         String name,
         String jobName,
+        String profileImage,
         // 프로젝트 목록
         List<ProjectSkillResDto> projectSkillResDto
-
 ){
 
     public static MemberPortfolioResDto toDto(Member member,
@@ -19,6 +19,7 @@ public record MemberPortfolioResDto (
         return MemberPortfolioResDto.builder()
                 .name(member.getName())
                 .jobName(member.getJob().getJobName())
+                .profileImage(member.getProfileImage())
                 .projectSkillResDto(projectSkillResDto)
                 .build();
     }

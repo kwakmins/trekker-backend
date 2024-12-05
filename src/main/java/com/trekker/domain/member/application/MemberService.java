@@ -4,11 +4,11 @@ import com.trekker.domain.member.dao.MemberRepository;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
 import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
+import com.trekker.domain.member.dto.res.MemberResDto;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dto.ProjectSkillDto;
 import com.trekker.domain.project.dto.res.ProjectSkillResDto;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
-import com.trekker.domain.task.dto.SkillCountDto;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.util.LinkedHashMap;
@@ -30,6 +30,17 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
     private final FileService fileService;
+
+    /**
+     * 회원의 정보를 조회합니다
+     * @param memberId 회원의 Id
+     * @return 회원의 이름, 직무, 프로필 경로 가 담긴 DTO
+     */
+    public MemberResDto getMember(Long memberId) {
+        Member member = findByIdWithJob(memberId);
+
+        return MemberResDto.toDto(member);
+    }
 
     /**
      * 온보딩 데이터를 업데이트 합니다.

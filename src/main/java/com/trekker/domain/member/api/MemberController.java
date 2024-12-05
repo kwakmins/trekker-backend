@@ -6,6 +6,7 @@ import com.trekker.domain.member.application.MemberService;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
 import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
+import com.trekker.domain.member.dto.res.MemberResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,24 +25,31 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @GetMapping
+    public ResponseEntity<MemberResDto> getMember(@LoginMember Long memberId) {
+        MemberResDto member = memberService.getMember(memberId);
 
-    @GetMapping("/portfolio")
-    public ResponseEntity<MemberPortfolioResDto> getPortfolio(@LoginMember Long id) {
-        MemberPortfolioResDto portfolio = memberService.getPortfolio(id);
-        return ResponseEntity.ok(portfolio);
+        return ResponseEntity.ok(member);
     }
+
     @PostMapping("/onboarding")
-    public ResponseEntity<Void> onBoarding(@LoginMember Long id,
+    public ResponseEntity<Void> onBoarding(@LoginMember Long memberId,
             @Valid @RequestBody OnboardingReqDto onboardingReqDto) {
-        memberService.updateOnboarding(id, onboardingReqDto);
+        memberService.updateOnboarding(memberId, onboardingReqDto);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Void> updateMember(@LoginMember Long id,
+    public ResponseEntity<Void> updateMember(@LoginMember Long memberId,
             @Valid @RequestBody MemberUpdateReqDto reqDto) {
-        memberService.updateMember(id, reqDto);
+        memberService.updateMember(memberId, reqDto);
         return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @GetMapping("/portfolio")
+    public ResponseEntity<MemberPortfolioResDto> getPortfolio(@LoginMember Long memberId) {
+        MemberPortfolioResDto portfolio = memberService.getPortfolio(memberId);
+        return ResponseEntity.ok(portfolio);
     }
 
 }

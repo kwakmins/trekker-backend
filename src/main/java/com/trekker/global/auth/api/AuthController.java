@@ -30,7 +30,7 @@ public class AuthController {
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<Void> deleteAccount(
             @LoginMember Long id,
             @RequestBody MemberWithdrawalReqDto reqDto

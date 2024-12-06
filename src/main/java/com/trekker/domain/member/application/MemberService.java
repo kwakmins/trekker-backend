@@ -27,9 +27,9 @@ public class MemberService {
     private static final String SOFT_SKILL = "소프트";
     private static final String HARD_SKILL = "하드";
 
+    private final FileService fileService;
     private final MemberRepository memberRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
-    private final FileService fileService;
 
     /**
      * 회원의 정보를 조회합니다

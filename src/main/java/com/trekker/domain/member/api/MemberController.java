@@ -9,7 +9,6 @@ import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
 import com.trekker.domain.member.dto.res.MemberResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

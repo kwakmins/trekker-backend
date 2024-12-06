@@ -1,7 +1,9 @@
 package com.trekker.domain.project.dto;
 
 import java.time.LocalDate;
+import lombok.Builder;
 
+@Builder
 public record ProjectSkillDto(
         Long projectId,
         String projectName,

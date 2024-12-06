@@ -128,13 +128,12 @@ class MemberServiceTest {
         MemberUpdateReqDto req = MemberUpdateReqDto.builder()
                 .name("이름 업데이트")
                 .jobName("직무 업데이트")
-                .profileImage(mock(MultipartFile.class))
-                 .build();
+                .build();
 
         when(memberRepository.findByIdWithJob(memberId)).thenReturn(Optional.of(mockMember));
 
         // when
-        memberService.updateMember(memberId, req);
+        memberService.updateMember(memberId, req, mock(MultipartFile.class));
 
         //then
         assertThat(mockMember.getName()).isEqualTo(req.name());

@@ -47,8 +47,10 @@ public class SecurityConfig {
                         STATELESS)) // 세션 정책을 STATELESS로 설정하여 서버에서 세션을 생성하지 않음
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/v1/auth/access/refresh","/api/v1/auth/refresh/reissue",
-                                        "/api/v1/auth/issue-final-token"
+                                .requestMatchers("/api/v1/auth/access/refresh",
+                                        "/api/v1/auth/refresh/reissue",
+                                        "/api/v1/auth/issue-final-token",
+                                        "/uploads/profile-images/**"
                                         , "/login/oauth2/**", "/oauth2/**", "/error",
                                         "/favicon.ico").permitAll()
                                 .anyRequest().authenticated())

@@ -67,12 +67,12 @@ public class MemberService {
      * @param reqDto   회원 업데이트 정보 DTO
      */
     @Transactional
-    public void updateMember(Long memberId, MemberUpdateReqDto reqDto) {
+    public void updateMember(Long memberId, MemberUpdateReqDto reqDto, MultipartFile profileImage) {
         Member member = findByIdWithJob(memberId);
 
         // 프로필 이미지가 요청에 포함된 경우
-        if (reqDto.profileImage() != null) {
-            handleProfileImageUpdate(member, reqDto.profileImage());
+        if (profileImage != null) {
+            handleProfileImageUpdate(member, profileImage);
         }
 
         // 나머지 멤버 정보 업데이트

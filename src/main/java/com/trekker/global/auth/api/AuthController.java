@@ -2,6 +2,7 @@ package com.trekker.global.auth.api;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
+import com.trekker.domain.member.dto.req.MemberWithdrawalReqDto;
 import com.trekker.global.auth.application.AuthService;
 import com.trekker.global.auth.dto.req.RefreshTokenReqDto;
 import com.trekker.global.auth.dto.res.AuthResDto;
@@ -31,9 +32,10 @@ public class AuthController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAccount(
-            @LoginMember Long id
+            @LoginMember Long id,
+            @RequestBody MemberWithdrawalReqDto reqDto
     ) {
-        authService.deleteAccount(id);
+        authService.deleteAccount(id, reqDto);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 

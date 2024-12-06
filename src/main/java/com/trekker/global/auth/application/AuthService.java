@@ -1,6 +1,8 @@
 package com.trekker.global.auth.application;
 
 import com.trekker.domain.member.dao.MemberRepository;
+import com.trekker.domain.member.dao.MemberWithdrawalFeedbackRepository;
+import com.trekker.domain.member.dto.req.MemberWithdrawalReqDto;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.global.auth.dto.res.AuthResDto;
 import com.trekker.global.auth.dto.res.RefreshTokenResDto;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final MemberWithdrawalFeedbackRepository feedbackRepository;
     private final TokenProvider tokenProvider;
     private final RedisRepository redisRepository;
     private final UnlinkService unlinkService;
@@ -79,12 +82,16 @@ public class AuthService {
      * 회원 계정으로 회원을 조회하고, 삭제합니다. 삭제하면서 연결된 소셜 계정과 연결을 끊습니다.
      *
      * @param memberId 사용자 memberId
+     * @param reqDto
      */
     @Transactional
-    public void deleteAccount(Long memberId) {
+    public void deleteAccount(Long memberId, MemberWithdrawalReqDto reqDto) {
         Member member = memberRepository.findByIdWithSocialAndOnboarding(memberId)
                 .orElseThrow(
                         () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND));
+
+        // 탈퇴 이유 및 피드백 저장
+        feedbackRepository.save(reqDto.toEntity(member));
 
         // 소셜 언링크 (연결 끊기)
         unlinkService.unlink(member);

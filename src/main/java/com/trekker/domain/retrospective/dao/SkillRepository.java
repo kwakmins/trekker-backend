@@ -39,6 +39,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 
     @Query("""
            SELECT new com.trekker.domain.retrospective.dto.res.SkillDetailResDto(
+               t.id,
                t.startDate,
                t.endDate,
                t.name,
@@ -50,6 +51,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
            JOIN r.task t
            JOIN t.project p
            WHERE s.id = :skillId AND p.member.id = :memberId
+           ORDER BY t.id
            """)
     List<SkillDetailResDto> findSkillDetailsBySkillIdAndMemberId(
             @Param("skillId") Long skillId,

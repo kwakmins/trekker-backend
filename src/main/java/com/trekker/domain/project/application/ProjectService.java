@@ -117,9 +117,10 @@ public class ProjectService {
         Map<Long, List<TaskRetrospectiveSkillDto>> groupedByTaskId = taskSkillDto.stream()
                 .collect(Collectors.groupingBy(TaskRetrospectiveSkillDto::taskId));
 
-        // 그룹화된 데이터를 TaskRetrospectiveResDto로 매핑
-        return groupedByTaskId.values().stream()
-                .map(this::mapToTaskRetrospectiveResDto)
+        // taskId를 기준으로 정렬한 후, 그룹화된 데이터를 TaskRetrospectiveResDto로 매핑
+        return groupedByTaskId.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()) // taskId 오름차순 정렬
+                .map(entry -> mapToTaskRetrospectiveResDto(entry.getValue()))
                 .collect(Collectors.toList());
     }
 

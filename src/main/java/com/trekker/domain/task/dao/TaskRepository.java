@@ -111,7 +111,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            JOIN r.retrospectiveSkillList rs
            JOIN rs.skill s
            WHERE p.id = :projectId AND m.id = :memberId
-           ORDER BY t.id
            """)
     List<TaskRetrospectiveSkillDto> findTaskRetrospectivesByProjectIdAndMemberId(
             @Param("projectId") Long projectId,

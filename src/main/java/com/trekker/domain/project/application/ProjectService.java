@@ -14,6 +14,7 @@ import com.trekker.domain.project.entity.Project;
 import com.trekker.domain.project.util.ProjectProgressCalculator;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
 import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
+import com.trekker.domain.task.dao.TaskRepository;
 import com.trekker.domain.task.dto.SkillCountDto;
 import com.trekker.domain.task.dto.TaskRetrospectiveSkillDto;
 import com.trekker.domain.task.dto.res.TaskRetrospectiveResDto;
@@ -21,6 +22,7 @@ import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +38,7 @@ public class ProjectService {
     private static final String HARD_SKILL = "하드";
 
     private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
     private final MemberRepository memberRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
     private final ProjectRetrospectiveRepository projectRetrospectiveRepository;
@@ -109,11 +112,13 @@ public class ProjectService {
      * @return TaskRetrospectiveResDto 리스트
      */
     public List<TaskRetrospectiveResDto> getProjectRetrospectiveList(Long memberId, Long projectId) {
-        return projectRepository.findTaskRetrospectivesByProjectIdAndMemberId(projectId, memberId)
-                .stream()
-                .collect(Collectors.groupingBy(TaskRetrospectiveSkillDto::taskId))
-                .values()
-                .stream()
+        List<TaskRetrospectiveSkillDto> taskSkillDto = taskRepository.findTaskRetrospectivesByProjectIdAndMemberId(projectId, memberId);
+        // taskId를 기준으로 그룹화
+        Map<Long, List<TaskRetrospectiveSkillDto>> groupedByTaskId = taskSkillDto.stream()
+                .collect(Collectors.groupingBy(TaskRetrospectiveSkillDto::taskId));
+
+        // 그룹화된 데이터를 TaskRetrospectiveResDto로 매핑
+        return groupedByTaskId.values().stream()
                 .map(this::mapToTaskRetrospectiveResDto)
                 .collect(Collectors.toList());
     }
@@ -210,7 +215,8 @@ public class ProjectService {
         return taskProjections.stream()
                 .filter(p -> skillType.equalsIgnoreCase(p.skillType()))
                 .map(TaskRetrospectiveSkillDto::skillName)
-                .filter(name -> name != null && !name.isEmpty())
+                .filter(name -> !name.isEmpty())
+                .distinct()
                 .collect(Collectors.toList());
     }
 

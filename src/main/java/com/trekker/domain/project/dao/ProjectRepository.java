@@ -2,7 +2,6 @@ package com.trekker.domain.project.dao;
 
 import com.trekker.domain.project.dto.res.ProjectWithTaskCompletedList;
 import com.trekker.domain.project.entity.Project;
-import com.trekker.domain.task.dto.TaskRetrospectiveSkillDto;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,24 +43,4 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             @Param("memberId") Long memberId);
 
 
-    @Query("""
-           SELECT new com.trekker.domain.task.dto.TaskRetrospectiveSkillDto(
-               t.id,
-               t.startDate,
-               t.endDate,
-               r.content,
-               rs.type,
-               s.name
-           )
-           FROM Task t
-           JOIN t.project p
-           JOIN p.member m
-           JOIN t.retrospective r
-           LEFT JOIN r.retrospectiveSkillList rs
-           LEFT JOIN rs.skill s
-           WHERE p.id = :projectId AND m.id = :memberId
-           """)
-    List<TaskRetrospectiveSkillDto> findTaskRetrospectivesByProjectIdAndMemberId(
-            @Param("projectId") Long projectId,
-            @Param("memberId") Long memberId);
 }

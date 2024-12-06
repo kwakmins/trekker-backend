@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SkillController {
 
     private final SkillService skillService;
+
     @GetMapping("/retrospective")
     public ResponseEntity<List<SkillSummaryResDto>> getSkillSummary(
             @LoginMember Long memberId) {

@@ -7,7 +7,7 @@ import com.trekker.global.config.security.annotation.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +28,10 @@ public class SkillController {
     @GetMapping("/retrospective")
     @Operation(
             summary = "회원 스킬 요약 조회",
-            description = "회원의 회고 데이터 기반으로 스킬 요약 정보를 조회합니다."
+            description = "회원의 회고 데이터 기반으로 스킬 요약 정보를 조회합니다.",
+            security = @SecurityRequirement(name = "BearerAuth")
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "스킬 요약 조회 성공"),
-    })
+    @ApiResponse(responseCode = "200", description = "스킬 요약 조회 성공")
     public ResponseEntity<List<SkillSummaryResDto>> getSkillSummary(
             @Parameter(hidden = true) @LoginMember Long memberId) {
         List<SkillSummaryResDto> skillSummaries = skillService.getSkillSummaryByMemberId(memberId);
@@ -42,11 +41,10 @@ public class SkillController {
     @GetMapping("/retrospective/{skillId}")
     @Operation(
             summary = "특정 스킬 상세 조회",
-            description = "회원의 특정 스킬에 대한 상세 정보를 조회합니다."
+            description = "회원의 특정 스킬에 대한 상세 정보를 조회합니다.",
+            security = @SecurityRequirement(name = "BearerAuth")
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "스킬 상세 조회 성공"),
-    })
+    @ApiResponse(responseCode = "200", description = "스킬 상세 조회 성공")
     public ResponseEntity<List<SkillDetailResDto>> getSkillDetails(
             @Parameter(hidden = true) @LoginMember Long memberId,
             @Parameter(description = "스킬 ID", example = "1") @PathVariable Long skillId) {

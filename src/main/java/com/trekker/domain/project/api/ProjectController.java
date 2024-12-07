@@ -15,6 +15,7 @@ import com.trekker.global.config.security.annotation.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -34,6 +35,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 생성",
             description = "새로운 프로젝트를 생성합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "201", description = "프로젝트 생성 성공")
             }
@@ -50,6 +52,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 목록 조회",
             description = "회원의 프로젝트 목록을 조회합니다. 프로젝트 타입을 필터링할 수 있습니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "프로젝트 목록 조회 성공")
             }
@@ -67,6 +70,7 @@ public class ProjectController {
     @Operation(
             summary = "전체 회고 조회",
             description = "회원의 전체 프로젝트 회고를 조회합니다. (사용자 회고 조회시 사용)",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "전체 회고 조회 성공")
             }
@@ -83,6 +87,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 회고 조회",
             description = "특정 프로젝트의 회고를 조회합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "프로젝트 회고 조회 성공")
             }
@@ -101,6 +106,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 수정",
             description = "특정 프로젝트의 정보를 수정합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "프로젝트 수정 성공")
             }
@@ -119,6 +125,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 삭제",
             description = "특정 프로젝트를 삭제합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "프로젝트 삭제 성공")
             }
@@ -134,8 +141,9 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/skill-summary")
     @Operation(
-            summary = "프로젝트 기술 요약 조회(프로젝트 종료시 조회)",
+            summary = "프로젝트 기술 요약 조회",
             description = "특정 프로젝트의 기술 요약 정보를 조회합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "프로젝트 기술 요약 조회 성공")
             }
@@ -154,6 +162,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 종료",
             description = "특정 프로젝트를 종료합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "프로젝트 종료 성공")
             }
@@ -172,6 +181,7 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 연장",
             description = "특정 프로젝트의 기간을 연장합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "프로젝트 연장 성공")
             }

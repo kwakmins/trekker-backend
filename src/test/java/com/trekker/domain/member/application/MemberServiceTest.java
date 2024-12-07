@@ -14,6 +14,7 @@ import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.member.entity.Onboarding;
 import com.trekker.domain.project.dto.ProjectSkillDto;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
+import com.trekker.global.service.file.FileService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

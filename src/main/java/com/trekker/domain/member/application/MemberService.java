@@ -1,5 +1,7 @@
 package com.trekker.domain.member.application;
 
+import static java.util.stream.Collectors.toList;
+
 import com.trekker.domain.member.dao.MemberRepository;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
@@ -14,6 +16,7 @@ import com.trekker.global.exception.enums.ErrorCode;
 import com.trekker.global.service.file.FileService;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -105,23 +108,28 @@ public class MemberService {
     /**
      * 프로젝트별로 데이터를 그룹화하고, 각 프로젝트별로 상위 7개의 소프트/하드 스킬을 추출합니다.
      *
-     * @param skillDto 조회된 프로젝트 스킬 데이터
+     * @param projectSkills 조회된 프로젝트 스킬 데이터
      * @return 각 프로젝트별로 상위 7개의 스킬을 포함한 DTO 목록
      */
     private List<ProjectSkillResDto> groupAndTransformProjectSkills(
-            List<ProjectSkillDto> skillDto) {
-        return skillDto.stream()
-                // 프로젝트 ID를 기준으로 그룹화
+            List<ProjectSkillDto> projectSkills) {
+
+        if (projectSkills == null || projectSkills.isEmpty()) {
+            return List.of(); // 빈 리스트 반환
+        }
+
+        // 프로젝트 ID를 기준으로 그룹화
+        Map<Long, List<ProjectSkillDto>> groupedByProject = projectSkills.stream()
                 .collect(Collectors.groupingBy(
                         ProjectSkillDto::projectId, // 그룹화 기준: 프로젝트 ID
                         LinkedHashMap::new,         // 순서 보장을 위한 LinkedHashMap 사용
-                        Collectors.toList()         // 각 그룹에 대한 데이터 목록 수집
-                ))
-                .values()
-                .stream()
-                // 각 그룹(프로젝트)에 대해 DTO로 변환
+                        toList()         // 각 그룹에 대한 데이터 목록 수집
+                ));
+
+        // 각 그룹(프로젝트)에 대해 DTO로 변환
+        return groupedByProject.values().stream()
                 .map(this::transformToProjectSkillResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -137,13 +145,13 @@ public class MemberService {
         List<String> softSkillList = extractTopSkills(projectSkills, SOFT_SKILL)
                 .stream()
                 .map(ProjectSkillDto::skillName)
-                .collect(Collectors.toList());
+                .collect(toList());
 
         // 상위 7개의 하드 스킬 추출
         List<String> hardSkillList = extractTopSkills(projectSkills, HARD_SKILL)
                 .stream()
                 .map(ProjectSkillDto::skillName)
-                .collect(Collectors.toList());
+                .collect(toList());
 
         // 첫 번째 항목에서 프로젝트 기본 정보를 추출
         ProjectSkillDto project = projectSkills.get(0);
@@ -166,7 +174,7 @@ public class MemberService {
                 .filter(dto -> skillType.equalsIgnoreCase(dto.skillType()))
                 // 상위 7개의 데이터만 추출
                 .limit(7)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     /**

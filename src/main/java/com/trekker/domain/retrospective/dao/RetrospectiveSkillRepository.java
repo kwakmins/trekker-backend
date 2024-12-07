@@ -56,7 +56,7 @@ public interface RetrospectiveSkillRepository extends JpaRepository<Retrospectiv
        JOIN r.task t
        JOIN t.project p
        JOIN p.member m
-       WHERE m.id = :memberId
+       WHERE m.id = :memberId AND p.isCompleted = true
        GROUP BY p.id, p.title, p.description, p.startDate, p.endDate, rs.type, rs.skill.name
        ORDER BY p.id, rs.type, COUNT(rs.skill.name) DESC
        """)

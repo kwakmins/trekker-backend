@@ -8,22 +8,10 @@ import java.util.Map;
 
 public record ReportResDto(
 
-        @Schema(description = "회원 소프트 스킬 목록",
-                example = """
-                [
-                  {"skillName": "커뮤니케이션", "count": 10},
-                  {"skillName": "문제 해결", "count": 8}
-                ]
-                          """)
+        @Schema(description = "회원 소프트 스킬 목록")
         List<SkillCountDto> softSkillList,
 
-        @Schema(description = "회원 하드 스킬 목록",
-                example = """
-                [
-                  {"skillName": "Spring Boot", "count": 15},
-                  {"skillName": "JPA", "count": 12}
-                ]
-                          """)
+        @Schema(description = "회원 하드 스킬 목록")
         List<SkillCountDto> hardSkillList,
 
         @Schema(description = "월 별 진행률 (날짜와 진행률 매핑)",
@@ -40,8 +28,8 @@ public record ReportResDto(
                 example = """
                 {
                   "2024-01-01": 5,
-                  "2024-01-08": 7,
-                  "2024-01-15": 4
+                  "2024-01-02": 7,
+                  "2024-01-03": 4
                 }
                          """)
         Map<LocalDate, Integer> weeklyCompletedTasks

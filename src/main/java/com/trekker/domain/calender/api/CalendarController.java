@@ -34,7 +34,7 @@ public class CalendarController {
             @ApiResponse(responseCode = "200", description = "월간 데이터 조회 성공")
     })
     public ResponseEntity<List<MonthlyTaskSummaryDto>> getMonthlyCalendar(
-            @Parameter(description = "회원 ID", example = "1") @LoginMember Long memberId,
+            @LoginMember Long memberId,
             @Parameter(description = "연도 (YYYY 형식)", example = "2024") @RequestParam int year,
             @Parameter(description = "월 (1-12)", example = "12") @RequestParam int month
     ) {
@@ -53,7 +53,7 @@ public class CalendarController {
             @ApiResponse(responseCode = "200", description = "오늘의 할 일 조회 성공")
     })
     public ResponseEntity<List<TaskResDto>> getTodayTask(
-            @Parameter(description = "회원 ID", example = "1") @LoginMember Long memberId
+            @LoginMember Long memberId
     ) {
         List<TaskResDto> todayTasks = calendarService.getTodayTasks(memberId);
         return ResponseEntity.ok(todayTasks);

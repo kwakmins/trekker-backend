@@ -1,0 +1,24 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: utf-8
+    session:
+      timeout: 60
+
+spring:
+  application:
+    name: "trekker"
+  config:
+    import: optional:file:.env[.properties]
+
+  profiles:
+    active: ${ACTIVE_PROFILE}
+
+
+#p6spy
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true

@@ -1,9 +1,28 @@
-jwt:
-  secret: ${JWT_SECRET}
 login:
   success-url: http://localhost:3000/success-page
 
 spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://trekker:3306/trekker?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&&socketTimeout=2000
+    username: root
+    password: ${DB_ROOT_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc.batch_size: 30
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_versioned_data: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   security:
     oauth2:
       client:
@@ -43,3 +62,6 @@ kakao:
 
 google:
   unlink-url: https://oauth2.googleapis.com/revoke
+
+jwt:
+  secret: ${JWT_SECRET}

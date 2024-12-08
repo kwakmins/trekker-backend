@@ -1,5 +1,7 @@
 package com.trekker.domain.retrospective.dao;
 
+import com.trekker.domain.retrospective.dto.res.SkillDetailResDto;
+import com.trekker.domain.retrospective.dto.res.SkillSummaryResDto;
 import com.trekker.domain.retrospective.entity.Skill;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.Collection;
@@ -19,4 +21,39 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
            """)
     List<Skill> findByNameIn(@Param("names") Collection<String> names);
 
+    @Query("""
+            SELECT new com.trekker.domain.retrospective.dto.res.SkillSummaryResDto(
+                s.id,
+                s.name,
+                COUNT(rs.skill.id)
+            )
+            FROM Skill s
+            JOIN RetrospectiveSkill rs ON s.id = rs.skill.id
+            JOIN rs.retrospective r
+            JOIN r.task t
+            JOIN t.project p
+            WHERE p.member.id = :memberId
+            GROUP BY s.id, s.name
+    """)
+    List<SkillSummaryResDto> findAllSkillsWithCountByMemberId(@Param("memberId") Long memberId);
+
+    @Query("""
+           SELECT new com.trekker.domain.retrospective.dto.res.SkillDetailResDto(
+               t.id,
+               t.startDate,
+               t.endDate,
+               t.name,
+               r.content
+           )
+           FROM Skill s
+           JOIN RetrospectiveSkill rs ON s.id = rs.skill.id
+           JOIN rs.retrospective r
+           JOIN r.task t
+           JOIN t.project p
+           WHERE s.id = :skillId AND p.member.id = :memberId
+           ORDER BY t.id
+           """)
+    List<SkillDetailResDto> findSkillDetailsBySkillIdAndMemberId(
+            @Param("skillId") Long skillId,
+            @Param("memberId") Long memberId);
 }

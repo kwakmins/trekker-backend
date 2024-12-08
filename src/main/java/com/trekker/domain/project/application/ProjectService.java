@@ -9,15 +9,20 @@ import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.domain.project.dto.req.ProjectRetrospectiveReqDto;
 import com.trekker.domain.project.dto.res.ProjectResDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
+import com.trekker.domain.project.dto.res.ProjectWithTaskCompletedList;
 import com.trekker.domain.project.entity.Project;
 import com.trekker.domain.project.util.ProjectProgressCalculator;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
 import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
+import com.trekker.domain.task.dao.TaskRepository;
 import com.trekker.domain.task.dto.SkillCountDto;
+import com.trekker.domain.task.dto.TaskRetrospectiveSkillDto;
+import com.trekker.domain.task.dto.res.TaskRetrospectiveResDto;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProjectService {
 
+    private static final String SOFT_SKILL = "소프트";
+    private static final String HARD_SKILL = "하드";
+
     private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
     private final MemberRepository memberRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
     private final ProjectRetrospectiveRepository projectRetrospectiveRepository;
@@ -84,6 +93,37 @@ public class ProjectService {
         return ProjectWithMemberInfoResDto.toDto(member, projectList);
     }
 
+    /**
+     * 회원의 작성한 회고의 개수를 프로젝트 별로 조회한다.
+     *
+     * @param memberId 회원의 Id
+     * @return 프로젝트 ID, 이름, 회고의 개수가 담긴 DTO
+     */
+    public List<ProjectWithTaskCompletedList> getTotalRetrospectivesProject(Long memberId) {
+        // 회고의 개수를 할일의 완료 여부로 조회
+        return projectRepository.findProjectWithTaskCompleted(memberId);
+    }
+
+    /**
+     * 특정 프로젝트의 회고 리스트를 조회하는 메소드
+     *
+     * @param memberId  조회할 회원의 ID
+     * @param projectId 조회할 프로젝트의 ID
+     * @return TaskRetrospectiveResDto 리스트
+     */
+    public List<TaskRetrospectiveResDto> getProjectRetrospectiveList(Long memberId, Long projectId) {
+        List<TaskRetrospectiveSkillDto> taskSkillDto = taskRepository.findTaskRetrospectivesByProjectIdAndMemberId(projectId, memberId);
+        // taskId를 기준으로 그룹화
+        Map<Long, List<TaskRetrospectiveSkillDto>> groupedByTaskId = taskSkillDto.stream()
+                .collect(Collectors.groupingBy(TaskRetrospectiveSkillDto::taskId));
+
+        // taskId를 기준으로 정렬한 후, 그룹화된 데이터를 TaskRetrospectiveResDto로 매핑
+        return groupedByTaskId.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()) // taskId 오름차순 정렬
+                .map(entry -> mapToTaskRetrospectiveResDto(entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void updateProject(Long memberId, Long projectId, ProjectReqDto projectReqDto) {
         // 회원 및 프로젝트 조회 및 검증
@@ -118,11 +158,11 @@ public class ProjectService {
 
         // 상위 3개의 소프트 스킬 반환
         List<SkillCountDto> topSoftSkills = retrospectiveSkillRepository.findTopSkillsByType(
-                projectId, "소프트", PageRequest.of(0, 3));
+                projectId, SOFT_SKILL, PageRequest.of(0, 3));
 
         // 상위 3개의 하드 스킬 반환
         List<SkillCountDto> topHardSkills = retrospectiveSkillRepository.findTopSkillsByType(
-                projectId, "하드", PageRequest.of(0, 3));
+                projectId, HARD_SKILL, PageRequest.of(0, 3));
 
         return ProjectSkillSummaryResDto.toDto(project, topSoftSkills, topHardSkills);
     }
@@ -149,6 +189,36 @@ public class ProjectService {
 
         // 종료 날짜 업데이트
         project.updateEndDate(reqDto.endDate());
+    }
+
+
+    /**
+     * 리스트에서 Task의 기본 정보와 스킬 데이터를 추출하여 반환합니다.
+     */
+    private TaskRetrospectiveResDto mapToTaskRetrospectiveResDto(List<TaskRetrospectiveSkillDto> taskProjections) {
+        TaskRetrospectiveSkillDto taskDto = taskProjections.get(0);
+
+        return TaskRetrospectiveResDto.toDto(
+                taskDto,
+                extractSkills(taskProjections, SOFT_SKILL),
+                extractSkills(taskProjections, HARD_SKILL)
+        );
+    }
+
+    /**
+     * 특정 스킬 타입에 해당하는 스킬 이름을 추출합니다.
+     *
+     * @param taskProjections TaskRetrospectiveSkillDto 리스트
+     * @param skillType        추출할 스킬 타입 (예: "소프트", "하드")
+     * @return 스킬 이름 리스트
+     */
+    private List<String> extractSkills(List<TaskRetrospectiveSkillDto> taskProjections, String skillType) {
+        return taskProjections.stream()
+                .filter(p -> skillType.equalsIgnoreCase(p.skillType()))
+                .map(TaskRetrospectiveSkillDto::skillName)
+                .filter(name -> !name.isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**

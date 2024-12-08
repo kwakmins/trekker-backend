@@ -1,6 +1,7 @@
 package com.trekker.domain.project.dto.res;
 
 import com.trekker.domain.project.entity.Project;
+import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
@@ -9,6 +10,10 @@ public record ProjectResDto (
        String type,
        String title,
        String description,
+       // 시작 날짜
+       LocalDate startDate,
+       //종료 날짜
+       LocalDate endDate,
        //진행률
        int progress
 ){
@@ -18,6 +23,8 @@ public record ProjectResDto (
                 .id(project.getId())
                 .type(project.getType())
                 .title(project.getTitle())
+                .startDate(project.getStartDate())
+                .endDate(project.getEndDate())
                 .description(project.getDescription())
                 .progress(progress)
                 .build();

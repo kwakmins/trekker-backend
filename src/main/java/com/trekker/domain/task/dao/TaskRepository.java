@@ -1,6 +1,7 @@
 package com.trekker.domain.task.dao;
 
 import com.trekker.domain.calender.dto.res.MonthlyTaskSummaryDto;
+import com.trekker.domain.task.dto.TaskRetrospectiveSkillDto;
 import com.trekker.domain.task.entity.Task;
 import java.time.LocalDate;
 import java.util.List;
@@ -92,4 +93,26 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            """)
     List<Task> findTasksInMonth(@Param("memberId") Long memberId, @Param("startOfMonth") LocalDate startOfMonth,
     @Param("endOfMonth") LocalDate endOfMonth);
+
+
+    @Query("""
+           SELECT new com.trekker.domain.task.dto.TaskRetrospectiveSkillDto(
+               t.id,
+               t.startDate,
+               t.endDate,
+               r.content,
+               rs.type,
+               s.name
+           )
+           FROM Task t
+           JOIN t.project p
+           JOIN p.member m
+           JOIN t.retrospective r
+           JOIN r.retrospectiveSkillList rs
+           JOIN rs.skill s
+           WHERE p.id = :projectId AND m.id = :memberId
+           """)
+    List<TaskRetrospectiveSkillDto> findTaskRetrospectivesByProjectIdAndMemberId(
+            @Param("projectId") Long projectId,
+            @Param("memberId") Long memberId);
 }

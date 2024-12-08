@@ -27,6 +27,7 @@ public enum ErrorCode {
     //Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
     MEMBER_ONBOARDING_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "온보딩을 이미 완료했습니다."),
+    MEMBER_FILE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다."),
 
     //Project
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트 정보를 찾을 수 없습니다."),

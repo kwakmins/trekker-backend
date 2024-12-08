@@ -10,10 +10,14 @@ import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.project.dao.ProjectRepository;
 import com.trekker.domain.project.dto.req.ProjectReqDto;
 import com.trekker.domain.project.dto.res.ProjectWithMemberInfoResDto;
+import com.trekker.domain.project.dto.res.ProjectWithTaskCompletedList;
 import com.trekker.domain.project.entity.Project;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
 import com.trekker.domain.retrospective.dto.res.ProjectSkillSummaryResDto;
+import com.trekker.domain.task.dao.TaskRepository;
 import com.trekker.domain.task.dto.SkillCountDto;
+import com.trekker.domain.task.dto.TaskRetrospectiveSkillDto;
+import com.trekker.domain.task.dto.res.TaskRetrospectiveResDto;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
 import java.time.LocalDate;
@@ -38,7 +42,10 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
     @Mock
     private MemberRepository memberRepository;
-
+    
+    @Mock
+    private TaskRepository taskRepository;
+    
     @Mock
     private RetrospectiveSkillRepository retrospectiveSkillRepository;
     private Member mockMember;
@@ -244,5 +251,74 @@ class ProjectServiceTest {
         assertThatThrownBy(() -> projectService.deleteProject(memberId, project.getId()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.ACCESS_DENIED_EXCEPTION.getMessage());
+    }
+
+    @DisplayName("회원의 프로젝트별 회고 개수를 조회한다.")
+    @Test
+    void getTotalRetrospectivesProject() {
+        // given
+        Long projectId1 = 1L;
+        Long projectId2 = 2L;
+        String projectName1 = "Project 1";
+        String projectName2 = "Project 2";
+        Long retrospectiveCount1 = 5L;
+        Long retrospectiveCount2 = 3L;
+
+        ProjectWithTaskCompletedList dto1 = new ProjectWithTaskCompletedList(projectId1, projectName1, retrospectiveCount1);
+        ProjectWithTaskCompletedList dto2 = new ProjectWithTaskCompletedList(projectId2, projectName2, retrospectiveCount2);
+
+        List<ProjectWithTaskCompletedList> mockResult = Arrays.asList(dto1, dto2);
+
+        when(projectRepository.findProjectWithTaskCompleted(memberId)).thenReturn(mockResult);
+
+        // when
+        List<ProjectWithTaskCompletedList> result = projectService.getTotalRetrospectivesProject(memberId);
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactlyInAnyOrder(dto1, dto2);
+    }
+
+    @DisplayName("회원이 참여한 프로젝트가 없을 때 빈 리스트를 반환한다.")
+    @Test
+    void getTotalRetrospectivesProject_NoProjects() {
+        // given
+        when(projectRepository.findProjectWithTaskCompleted(memberId)).thenReturn(List.of());
+
+        // when
+        List<ProjectWithTaskCompletedList> result = projectService.getTotalRetrospectivesProject(memberId);
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @DisplayName("특정 프로젝트의 회고 리스트를 조회한다.")
+    @Test
+    void getProjectRetrospectiveList() {
+        // given
+        Long projectId = 1L;
+        // Mock TaskRetrospectiveSkillDto 리스트
+        TaskRetrospectiveSkillDto dto1 = new TaskRetrospectiveSkillDto(1L, LocalDate.now(),
+                LocalDate.now().plusDays(7), null, "소프트", "Communication");
+        TaskRetrospectiveSkillDto dto2 = new TaskRetrospectiveSkillDto(1L, LocalDate.now(),
+                LocalDate.now().plusDays(7), null, "하드", "Java");
+        TaskRetrospectiveSkillDto dto3 = new TaskRetrospectiveSkillDto(2L,
+                LocalDate.now(), LocalDate.now().plusDays(5), null, "소프트",
+                "Problem Solving");
+
+        List<TaskRetrospectiveSkillDto> mockTaskRetrospectives = Arrays.asList(dto1, dto2, dto3);
+
+        when(taskRepository.findTaskRetrospectivesByProjectIdAndMemberId(projectId, memberId))
+                .thenReturn(mockTaskRetrospectives);
+
+        // when
+        List<TaskRetrospectiveResDto> result = projectService.getProjectRetrospectiveList(memberId,
+                projectId);
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).taskId()).isEqualTo(dto1.taskId());
+        assertThat(result.get(0).softSkillList().get(0)).isEqualTo(dto1.skillName());
+        assertThat(result.get(1).softSkillList().get(0)).isEqualTo(dto3.skillName());
     }
 }

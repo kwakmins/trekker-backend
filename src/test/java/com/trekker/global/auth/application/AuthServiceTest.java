@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import com.trekker.domain.member.dao.MemberRepository;
+import com.trekker.domain.member.dao.MemberWithdrawalFeedbackRepository;
+import com.trekker.domain.member.dto.req.MemberWithdrawalReqDto;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.member.entity.SocialProvider;
 import com.trekker.global.auth.dto.res.AuthResDto;
@@ -36,6 +38,8 @@ class AuthServiceTest {
 
     @Mock
     private UnlinkService unlinkService;
+    @Mock
+    private MemberWithdrawalFeedbackRepository feedbackRepository;
 
     @Test
     void logout() {
@@ -112,11 +116,13 @@ class AuthServiceTest {
                 .id(1L)
                 .socialProvider(mock(SocialProvider.class))
                 .build();
+        MemberWithdrawalReqDto reqDto = new MemberWithdrawalReqDto("feedback",
+                "reason");
 
         when(memberRepository.findByIdWithSocialAndOnboarding(id)).thenReturn(Optional.of(member));
 
         // when
-        authService.deleteAccount(id);
+        authService.deleteAccount(id, reqDto);
 
         // then
         verify(unlinkService, times(1)).unlink(member);
@@ -129,11 +135,13 @@ class AuthServiceTest {
     void failToDeleteAccountWhenMemberNotFound() {
         // given
         Long nonExistentId = 3L;
+        MemberWithdrawalReqDto reqDto = new MemberWithdrawalReqDto("feedback",
+                "reason");
 
         when(memberRepository.findByIdWithSocialAndOnboarding(nonExistentId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> authService.deleteAccount(nonExistentId))
+        assertThatThrownBy(() -> authService.deleteAccount(nonExistentId, reqDto))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         verify(memberRepository, times(1)).findByIdWithSocialAndOnboarding(nonExistentId);

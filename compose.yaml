@@ -1,0 +1,61 @@
+services:
+  mysql:
+    image: mysql:8.4.3
+    networks:
+      - service
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root5479
+      MYSQL_DATABASE: root
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
+  redis:
+    image: redis:latest
+
+  was:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - service
+    restart: always
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+    depends_on:
+      - mysql
+      - redis
+    env_file:
+      - .env.prod
+
+  web:
+    image: nginx
+    ports:
+      - "5478:80"
+    networks:
+      - service
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+    depends_on:
+      - was
+
+networks:
+  service:
+
+volumes:
+  mysql-volume:

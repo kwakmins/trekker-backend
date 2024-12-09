@@ -1,10 +1,10 @@
 login:
-  success-url: http://localhost:3000/success-page
+  success-url: http://localhost:3000/success-page #추후 DNS로 변경
 
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://trekker:3306/trekker?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&&socketTimeout=2000
+    url: jdbc:mysql://mysql:3306/trekker?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&&socketTimeout=2000
     username: root
     password: ${DB_ROOT_PASSWORD}
 
@@ -20,7 +20,7 @@ spring:
           batch_versioned_data: true
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
   security:

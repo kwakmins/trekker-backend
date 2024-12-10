@@ -62,8 +62,7 @@ public class AuthController {
     @PostMapping("/access/refresh")
     @Operation(
             summary = "엑세스 토큰 재발급",
-            description = "리프레시 토큰을 통해 새로운 엑세스 토큰을 재발급합니다.",
-            security = {} // 인증 필요 없음
+            description = "리프레시 토큰을 통해 새로운 엑세스 토큰을 재발급합니다."
     )
     @ApiResponse(responseCode = "200", description = "엑세스 토큰 재발급 성공")
     public ResponseEntity<AuthResDto> refreshAccessToken(
@@ -77,8 +76,7 @@ public class AuthController {
     @PostMapping("/refresh/reissue")
     @Operation(
             summary = "리프레시 토큰 재발급",
-            description = "만료된 리프레시 토큰을 재발급합니다.",
-            security = {} // 인증 필요 없음
+            description = "만료된 리프레시 토큰을 재발급합니다."
     )
     @ApiResponse(responseCode = "200", description = "리프레시 토큰 재발급 성공")
     public ResponseEntity<RefreshTokenResDto> reissueRefreshToken(
@@ -93,8 +91,7 @@ public class AuthController {
     @GetMapping("/issue-final-token")
     @Operation(
             summary = "최종 토큰 발급",
-            description = "임시 토큰을 검증하고 최종 엑세스 및 리프레시 토큰을 발급합니다.",
-            security = {} // 인증 필요 없음
+            description = "임시 토큰을 검증하고 최종 엑세스 및 리프레시 토큰을 발급합니다."
     )
     @ApiResponse(responseCode = "200", description = "최종 토큰 발급 성공")
     public ResponseEntity<AuthResDto> issueFinalTokens(

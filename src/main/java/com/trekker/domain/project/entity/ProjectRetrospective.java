@@ -2,7 +2,6 @@ package com.trekker.domain.project.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.trekker.domain.task.entity.Task;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

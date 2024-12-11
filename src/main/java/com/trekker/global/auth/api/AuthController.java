@@ -24,7 +24,8 @@ public class AuthController implements AuthApi {
     private static final String BEARER_PREFIX = "Bearer ";
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader(AUTHORIZATION_HEADER) String accessToken) {
+    public ResponseEntity<Void> logout(
+            @RequestHeader(AUTHORIZATION_HEADER) String accessToken) {
         String token = resolveToken(accessToken);
         authService.logout(token);
         return ResponseEntity.status(NO_CONTENT).build();
@@ -57,6 +58,9 @@ public class AuthController implements AuthApi {
         return ResponseEntity.ok(refreshTokenResDto);
     }
 
+    /**
+     * 임시 토큰을 검증하고 최종 액세스 및 리프레시 토큰 발급
+     */
     @GetMapping("/issue-final-token")
     public ResponseEntity<AuthResDto> issueFinalTokens(
             @RequestParam("tempToken") @NotNull String tempToken

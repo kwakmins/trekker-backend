@@ -13,7 +13,7 @@ public record MemberPortfolioResDto(
         String jobName,
 
         String profileImage,
-
+        // 프로젝트 목록
         List<ProjectSkillResDto> projectSkillResDto
 ) {
 

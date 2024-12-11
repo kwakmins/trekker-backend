@@ -19,9 +19,9 @@ public record ProjectWithTaskInfoResDto(
         LocalDate startDate,
 
         LocalDate endDate,
-
+        // 주간 성취 달력
         List<TaskCompletionStatusResDto> weeklyAchievement,
-
+        // 선택한 날짜의 할 일 목록
         List<TaskResDto> taskList
 ) {
 

@@ -27,7 +27,7 @@ public class TaskController implements TaskApi {
     @PostMapping
     public ResponseEntity<Long> addTask(
             @LoginMember Long memberId,
-            @PathVariable(name = "projectId" ) Long projectId,
+            @PathVariable(name = "projectId") Long projectId,
             @Valid @RequestBody TaskReqDto taskReqDto
     ) {
         Long taskId = taskService.addTask(memberId, projectId, taskReqDto);
@@ -37,7 +37,7 @@ public class TaskController implements TaskApi {
     @GetMapping
     public ResponseEntity<ProjectWithTaskInfoResDto> getTaskList(
             @LoginMember Long memberId,
-            @PathVariable(name = "projectId" ) Long projectId,
+            @PathVariable(name = "projectId") Long projectId,
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate reqDate
     ) {
         ProjectWithTaskInfoResDto resDto = taskService.getTaskList(memberId, projectId, reqDate);
@@ -47,7 +47,7 @@ public class TaskController implements TaskApi {
     @PutMapping("/{taskId}")
     public ResponseEntity<Void> updateTask(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId" ) Long taskId,
+            @PathVariable(name = "taskId") Long taskId,
             @Valid @RequestBody TaskReqDto taskReqDto
     ) {
         taskService.updateTask(memberId, taskId, taskReqDto);
@@ -57,7 +57,7 @@ public class TaskController implements TaskApi {
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId" ) Long taskId
+            @PathVariable(name = "taskId") Long taskId
     ) {
         taskService.deleteTask(memberId, taskId);
         return ResponseEntity.status(NO_CONTENT).build();

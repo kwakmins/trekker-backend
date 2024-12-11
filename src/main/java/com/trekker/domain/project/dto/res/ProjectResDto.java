@@ -18,7 +18,7 @@ public record ProjectResDto(
         LocalDate startDate,
 
         LocalDate endDate,
-
+        // 진행률
         int progress
 ) {
 

@@ -27,7 +27,8 @@ public class CalendarController implements CalendarApi {
             @RequestParam int year,
             @RequestParam int month
     ) {
-        List<MonthlyTaskSummaryDto> calendar = calendarService.getMonthlyCalendar(memberId, year, month);
+        List<MonthlyTaskSummaryDto> calendar = calendarService.getMonthlyCalendar(memberId, year,
+                month);
         return ResponseEntity.ok(calendar);
     }
 

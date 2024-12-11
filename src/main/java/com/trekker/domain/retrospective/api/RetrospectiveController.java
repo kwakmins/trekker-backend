@@ -24,7 +24,7 @@ public class RetrospectiveController implements RetrospectiveApi {
     @PostMapping
     public ResponseEntity<Long> addRetrospective(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId" ) Long taskId,
+            @PathVariable(name = "taskId") Long taskId,
             @Valid @RequestBody RetrospectiveReqDto reqDto
     ) {
         Long retrospectiveId = retrospectiveService.addRetrospective(memberId, taskId, reqDto);
@@ -34,7 +34,7 @@ public class RetrospectiveController implements RetrospectiveApi {
     @GetMapping
     public ResponseEntity<RetrospectiveResDto> getRetrospective(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId" ) Long taskId
+            @PathVariable(name = "taskId") Long taskId
     ) {
         RetrospectiveResDto retrospective = retrospectiveService.getRetrospective(memberId, taskId);
         return ResponseEntity.ok(retrospective);
@@ -43,7 +43,7 @@ public class RetrospectiveController implements RetrospectiveApi {
     @PutMapping
     public ResponseEntity<Void> updateRetrospective(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId" ) Long taskId,
+            @PathVariable(name = "taskId") Long taskId,
             @Valid @RequestBody RetrospectiveReqDto reqDto
     ) {
         retrospectiveService.updateRetrospective(memberId, taskId, reqDto);
@@ -53,7 +53,7 @@ public class RetrospectiveController implements RetrospectiveApi {
     @DeleteMapping
     public ResponseEntity<Void> deleteRetrospective(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId" ) Long taskId
+            @PathVariable(name = "taskId") Long taskId
     ) {
         retrospectiveService.deleteRetrospective(memberId, taskId);
         return ResponseEntity.status(NO_CONTENT).build();

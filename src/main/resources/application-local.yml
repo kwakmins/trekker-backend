@@ -62,3 +62,6 @@ google:
 
 jwt:
   secret: ${JWT_SECRET}
+
+file:
+  dir: ${FILE_DIR}

@@ -38,7 +38,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException {
         CustomUserDetails oAuth2User = (CustomUserDetails) authentication.getPrincipal();
-        OAuth2AuthenticationToken authToken = (OAuth2AuthenticationToken) authentication;
+//        OAuth2AuthenticationToken authToken = (OAuth2AuthenticationToken) authentication;
 
         // 최종 액세스 및 리프레시 토큰 생성
         AuthResDto authResponse = tokenProvider.createAuthResponse(authentication);
@@ -48,7 +48,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         String account = oAuth2User.getId();
 
         // 제공자가 google일 경우, 추후 회원 탈퇴를 위한 리프래시 토큰 저장
-        handleGoogleRefreshToken(authToken, account);
+//        handleGoogleRefreshToken(authToken, account);
 
         // 성공 URL에 쿼리 파라미터로 임시 토큰과 isGuest 정보를 전달
         String redirectUrl = UriComponentsBuilder.fromUriString(SUCCESS_URL)

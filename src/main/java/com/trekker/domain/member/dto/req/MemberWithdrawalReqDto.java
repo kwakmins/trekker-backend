@@ -6,6 +6,8 @@ import com.trekker.domain.member.entity.MemberWithdrawalFeedback;
 // 탈퇴 시 필요로 하는 요청 값(피드백)을 담는 DTO
 public record MemberWithdrawalReqDto(
 
+        String accessToken,
+
         String feedback,
 
         String reason

@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReportService {
 
-    private static final String SOFT_SKILL = "소프트";
-    private static final String HARD_SKILL = "하드";
+    private static final String SOFT_SKILL = "soft";
+    private static final String HARD_SKILL = "hard";
     private static final String TOTAL_TASK = "totalTasks";
     private static final String COMPLETED_TASK = "completedTasks";
 

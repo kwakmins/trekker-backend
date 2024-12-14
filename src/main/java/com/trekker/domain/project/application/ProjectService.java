@@ -34,8 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProjectService {
 
-    private static final String SOFT_SKILL = "소프트";
-    private static final String HARD_SKILL = "하드";
+    private static final String SOFT_SKILL = "soft";
+    private static final String HARD_SKILL = "hard";
 
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;

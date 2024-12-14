@@ -25,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class TaskService {
 
-    private static final int TASK_RANGE_DAYS = 3;
-
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
 

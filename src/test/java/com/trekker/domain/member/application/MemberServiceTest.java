@@ -63,7 +63,7 @@ class MemberServiceTest {
                 .projectDescription("project1")
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(10))
-                .skillType("소프트")
+                .skillType("soft")
                 .skillName("Communication")
                 .skillCount(5L)
                 .build();
@@ -74,7 +74,7 @@ class MemberServiceTest {
                 .projectDescription("project2")
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(10))
-                .skillType("소프트")
+                .skillType("soft")
                 .skillName("Communication")
                 .skillCount(5L)
                 .build();
@@ -85,7 +85,7 @@ class MemberServiceTest {
                 .projectDescription("project2")
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(10))
-                .skillType("하드")
+                .skillType("hard")
                 .skillName("Spring Boot")
                 .skillCount(5L)
                 .build();

@@ -28,8 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class MemberService {
 
-    private static final String SOFT_SKILL = "소프트";
-    private static final String HARD_SKILL = "하드";
+    private static final String SOFT_SKILL = "soft";
+    private static final String HARD_SKILL = "hard";
 
     private final FileService fileService;
     private final MemberRepository memberRepository;

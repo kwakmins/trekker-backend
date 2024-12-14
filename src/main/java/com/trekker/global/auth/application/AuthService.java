@@ -147,7 +147,7 @@ public class AuthService {
     private void validateGoogleAccessToken(String accessToken) {
         boolean googleTokenValid = googleTokenValidator.validateAccessToken(accessToken);
         if (!googleTokenValid) {
-            throw new IllegalArgumentException("유효하지 않은 Google Access Token입니다.");
+            throw new BusinessException("accessToken", accessToken, ErrorCode.BAD_REQUEST);
         }
     }
 
@@ -161,7 +161,7 @@ public class AuthService {
     private OAuth2UserRequest createOAuth2UserRequest(String accessToken) {
         ClientRegistration registration = clientRegistrationRepository.findByRegistrationId("google");
         if (registration == null) {
-            throw new IllegalStateException("Google 클라이언트 설정을 찾을 수 없습니다.");
+            throw new BusinessException("accessToken", accessToken, ErrorCode.BAD_REQUEST);
         }
 
         OAuth2AccessToken token = new OAuth2AccessToken(

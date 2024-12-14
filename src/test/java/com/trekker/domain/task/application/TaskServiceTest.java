@@ -83,7 +83,6 @@ class TaskServiceTest {
     void validateTaskDatesEndDateAfterProjectEnd() {
         // given
         LocalDate projectStartDate = LocalDate.now();
-        LocalDate validStartDate = projectStartDate;
         LocalDate invalidEndDate = projectStartDate.plusDays(10); // 프로젝트 종료일 이후 날짜 설정
         Project project = Project.builder()
                 .id(1L)
@@ -92,7 +91,8 @@ class TaskServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> taskService.validateTaskDatesWithinProject(project, validStartDate, invalidEndDate))
+        assertThatThrownBy(() -> taskService.validateTaskDatesWithinProject(project,
+                projectStartDate, invalidEndDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.TASK_BAD_REQUEST.getMessage());
     }

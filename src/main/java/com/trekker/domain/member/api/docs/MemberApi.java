@@ -1,5 +1,6 @@
 package com.trekker.domain.member.api.docs;
 
+import com.trekker.domain.member.dto.req.MemberFeedbackReqDto;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
 import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
@@ -73,5 +74,18 @@ public interface MemberApi {
     })
     ResponseEntity<MemberPortfolioResDto> getPortfolio(
             @Parameter(hidden = true) Long memberId
+    );
+
+    @Operation(
+            summary = "회원 피드백 저장",
+            description = "회원의 피드백을 저장합니다.",
+            security = @SecurityRequirement(name = "BearerAuth" )
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "회원 피드백 저장 성공" )
+    })
+    ResponseEntity<Void> saveFeedback(
+            @Parameter(hidden = true) Long memberId,
+            MemberFeedbackReqDto memberFeedbackReqDto
     );
 }

@@ -2,6 +2,7 @@ package com.trekker.domain.member.api;
 
 import com.trekker.domain.member.api.docs.MemberApi;
 import com.trekker.domain.member.application.MemberService;
+import com.trekker.domain.member.dto.req.MemberFeedbackReqDto;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
 import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
@@ -50,5 +51,14 @@ public class MemberController implements MemberApi {
     public ResponseEntity<MemberPortfolioResDto> getPortfolio(@LoginMember Long memberId) {
         MemberPortfolioResDto portfolio = memberService.getPortfolio(memberId);
         return ResponseEntity.ok(portfolio);
+    }
+
+    @PostMapping("/feedback")
+    public ResponseEntity<Void> saveFeedback(
+            @LoginMember Long memberId,
+            @RequestBody MemberFeedbackReqDto feedbackReqDto
+    ) {
+        memberService.saveFeedBack(memberId, feedbackReqDto);
+        return ResponseEntity.noContent().build();
     }
 }

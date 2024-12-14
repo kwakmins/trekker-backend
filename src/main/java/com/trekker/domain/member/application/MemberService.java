@@ -2,12 +2,15 @@ package com.trekker.domain.member.application;
 
 import static java.util.stream.Collectors.toList;
 
+import com.trekker.domain.member.dao.MemberFeedbackRepository;
 import com.trekker.domain.member.dao.MemberRepository;
+import com.trekker.domain.member.dto.req.MemberFeedbackReqDto;
 import com.trekker.domain.member.dto.req.MemberUpdateReqDto;
 import com.trekker.domain.member.dto.req.OnboardingReqDto;
 import com.trekker.domain.member.dto.res.MemberPortfolioResDto;
 import com.trekker.domain.member.dto.res.MemberResDto;
 import com.trekker.domain.member.entity.Member;
+import com.trekker.domain.member.entity.MemberFeedback;
 import com.trekker.domain.project.dto.ProjectSkillDto;
 import com.trekker.domain.project.dto.res.ProjectSkillResDto;
 import com.trekker.domain.retrospective.dao.RetrospectiveSkillRepository;
@@ -34,6 +37,7 @@ public class MemberService {
     private final FileService fileService;
     private final MemberRepository memberRepository;
     private final RetrospectiveSkillRepository retrospectiveSkillRepository;
+    private final MemberFeedbackRepository memberFeedbackRepository;
 
     /**
      * 회원의 정보를 조회합니다
@@ -102,6 +106,15 @@ public class MemberService {
 
         // 회원 정보와 프로젝트 데이터를 기반으로 포트폴리오 생성
         return MemberPortfolioResDto.toDto(member, projectSkillResDto);
+    }
+
+    @Transactional
+    public void saveFeedBack(Long memberId, MemberFeedbackReqDto feedbackReqDto) {
+        Member member = findByIdWithJob(memberId);
+
+        MemberFeedback memberFeedback = feedbackReqDto.toEntity(member);
+
+        memberFeedbackRepository.save(memberFeedback);
     }
 
 

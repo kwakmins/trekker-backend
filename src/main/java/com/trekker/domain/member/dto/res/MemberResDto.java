@@ -10,6 +10,8 @@ public record MemberResDto(
 
         String jobName,
 
+        String provider,
+
         String profileImage
 ) {
 
@@ -17,6 +19,7 @@ public record MemberResDto(
         return MemberResDto.builder()
                 .name(member.getName())
                 .jobName(member.getJob().getJobName())
+                .provider(member.getSocialProvider().getProvider())
                 .profileImage(member.getProfileImage())
                 .build();
     }

@@ -31,6 +31,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            SELECT m
            FROM Member m
            LEFT JOIN FETCH m.job
+           LEFT JOIN FETCH m.socialProvider
            WHERE m.id =:memberId
            """)
     Optional<Member> findByIdWithJob(@Param("memberId") Long memberId);

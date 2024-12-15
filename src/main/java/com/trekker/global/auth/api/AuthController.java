@@ -5,18 +5,22 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.trekker.domain.member.dto.req.MemberWithdrawalReqDto;
 import com.trekker.global.auth.api.docs.AuthApi;
 import com.trekker.global.auth.application.AuthService;
+import com.trekker.global.auth.dto.req.GoogleLoginReqDto;
 import com.trekker.global.auth.dto.req.RefreshTokenReqDto;
 import com.trekker.global.auth.dto.res.AuthResDto;
+import com.trekker.global.auth.dto.res.GoogleRes;
 import com.trekker.global.auth.dto.res.RefreshTokenResDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController implements AuthApi {
 
     private final AuthService authService;
@@ -67,6 +71,14 @@ public class AuthController implements AuthApi {
     ) {
         AuthResDto authResponse = authService.retrieveAuthResponse(tempToken);
         return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/google/login")
+    public ResponseEntity<GoogleRes> loginWithGoogle(@RequestBody GoogleLoginReqDto request) {
+        log.info("request ={} ", request);
+        GoogleRes googleRes = authService.authenticateGoogleUser(request);
+
+        return ResponseEntity.ok(googleRes);
     }
 
     private String resolveToken(String accessToken) {

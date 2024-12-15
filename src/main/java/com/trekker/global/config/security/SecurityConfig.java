@@ -50,6 +50,7 @@ public class SecurityConfig {
                                         "/api/v1/auth/access/refresh",
                                         "/api/v1/auth/refresh/reissue",
                                         "/api/v1/auth/issue-final-token",
+                                        "/api/v1/auth/google/login",
                                         "/uploads/profile-images/**",
                                         "/login/oauth2/**",
                                         "/oauth2/**",

@@ -1,5 +1,6 @@
 package com.trekker.global.auth.application;
 
+import com.trekker.domain.member.dto.req.MemberWithdrawalReqDto;
 import com.trekker.domain.member.entity.Member;
 import com.trekker.domain.member.entity.SocialProvider;
 import com.trekker.global.config.redis.dao.RedisRepository;
@@ -36,7 +37,7 @@ public class UnlinkService {
      *
      * @param member 연결 해제할 회원
      */
-    public void unlink(Member member) {
+    public void unlink(Member member, MemberWithdrawalReqDto reqDto) {
         SocialProvider socialProvider = member.getSocialProvider();
 
         try {
@@ -45,7 +46,7 @@ public class UnlinkService {
                     unlinkKakao(socialProvider.getProviderId());
                     break;
                 case "google":
-                    unlinkGoogle(String.valueOf(member.getId()));
+                    unlinkGoogle(String.valueOf(member.getId()), reqDto.accessToken());
                     break;
                 default:
                     throw new BusinessException(ErrorCode.UNSUPPORTED_SOCIAL_PROVIDER);
@@ -87,22 +88,15 @@ public class UnlinkService {
      *
      * @param memberId 사용자 Id
      */
-    private void unlinkGoogle(String memberId) {
-        String refreshToken = redisRepository.fetchAndDeleteSocialRefreshToken(memberId);
-
-        if (refreshToken == null) {
-            log.error("구글 연결 끊기 실패: Refresh Token이 없습니다.");
-            throw new BusinessException(memberId, "refreshToken", ErrorCode.SOCIAL_UNLINK_FAILED);
-        }
-
-        String url = GOOGLE_UNLINK_URL + "?token=" + refreshToken;
+    private void unlinkGoogle(String memberId, String accessToken) {
+        String url = GOOGLE_UNLINK_URL + "?token=" + accessToken;
 
         try {
             restTemplate.postForEntity(url, null, String.class);
             log.info("구글 연결 끊기 성공: 사용자 ID = {}", memberId);
         } catch (Exception e) {
-            log.error("구글 연결 끊기 실패: Refresh Token = {}", refreshToken, e);
-            throw new BusinessException(refreshToken, "refreshToken",
+            log.error("구글 연결 끊기 실패: Refresh Token = {}", accessToken, e);
+            throw new BusinessException(accessToken, "accessToken",
                     ErrorCode.SOCIAL_UNLINK_FAILED);
         }
     }

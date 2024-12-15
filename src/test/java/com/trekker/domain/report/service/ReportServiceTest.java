@@ -83,9 +83,9 @@ class ReportServiceTest {
         LocalDate startOfMonth = LocalDate.of(today.getYear(), today.getMonth(), 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-        when(retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, "소프트",
+        when(retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, "soft",
                 PageRequest.of(0, 3))).thenReturn(mockSoftSkillList);
-        when(retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, "하드",
+        when(retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, "hard",
                 PageRequest.of(0, 3))).thenReturn(mockHardSkillList);
         when(taskRepository.findTasksInMonth(memberId, startOfMonth, endOfMonth)).thenReturn(
                 List.of(task1, task2));
@@ -110,7 +110,7 @@ class ReportServiceTest {
     @Test
     void getMemberSkillList() {
         // given
-        String type = "하드";
+        String type = "hard";
         when(retrospectiveSkillRepository.findTopSkillsByMemberIdAndType(memberId, type, Pageable.unpaged())).thenReturn(
                 mockHardSkillList);
 

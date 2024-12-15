@@ -116,7 +116,7 @@ class AuthServiceTest {
                 .id(1L)
                 .socialProvider(mock(SocialProvider.class))
                 .build();
-        MemberWithdrawalReqDto reqDto = new MemberWithdrawalReqDto("feedback",
+        MemberWithdrawalReqDto reqDto = new MemberWithdrawalReqDto("accessToken", "feedback",
                 "reason");
 
         when(memberRepository.findByIdWithSocialAndOnboarding(id)).thenReturn(Optional.of(member));
@@ -125,7 +125,7 @@ class AuthServiceTest {
         authService.deleteAccount(id, reqDto);
 
         // then
-        verify(unlinkService, times(1)).unlink(member);
+        verify(unlinkService, times(1)).unlink(member, reqDto);
         verify(memberRepository, times(1)).findByIdWithSocialAndOnboarding(id);
         assertThat(member.isDelete()).isTrue();
     }
@@ -135,7 +135,7 @@ class AuthServiceTest {
     void failToDeleteAccountWhenMemberNotFound() {
         // given
         Long nonExistentId = 3L;
-        MemberWithdrawalReqDto reqDto = new MemberWithdrawalReqDto("feedback",
+        MemberWithdrawalReqDto reqDto = new MemberWithdrawalReqDto("accessToken","feedback",
                 "reason");
 
         when(memberRepository.findByIdWithSocialAndOnboarding(nonExistentId)).thenReturn(Optional.empty());
@@ -145,6 +145,6 @@ class AuthServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         verify(memberRepository, times(1)).findByIdWithSocialAndOnboarding(nonExistentId);
-        verify(unlinkService, never()).unlink(any(Member.class));
+        verify(unlinkService, never()).unlink(any(Member.class),any());
     }
 }

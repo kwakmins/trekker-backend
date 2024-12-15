@@ -11,7 +11,9 @@ import com.trekker.domain.task.entity.Task;
 import com.trekker.domain.task.util.TaskFilter;
 import com.trekker.global.exception.custom.BusinessException;
 import com.trekker.global.exception.enums.ErrorCode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TaskService {
-
-    private static final int TASK_RANGE_DAYS = 3;
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
@@ -50,16 +50,17 @@ public class TaskService {
      * @param memberId  사용자의 id
      * @param projectId 조회할 프로젝트의 Id.
      * @param reqDate   기준 날짜
-     * @return ProjectWithTaskInfoResDto - 프로젝트 정보와 함께 기준 날짜의 태스크 목록, ±3일 내 완료 상태를 포함.
+     * @return ProjectWithTaskInfoResDto - 프로젝트 정보와 함께 기준 날짜의 태스크 목록, 기간 내 완료 상태를 포함.
      */
     public ProjectWithTaskInfoResDto getTaskList(Long memberId, Long projectId, LocalDate reqDate) {
         // 프로젝트 정보 조회 및 사용자 검증
         Project project = findProjectByIdWithMember(projectId);
         project.validateOwner(memberId);
 
-        // +-3일 범위 계산
-        LocalDate startDate = reqDate.minusDays(TASK_RANGE_DAYS);
-        LocalDate endDate = reqDate.plusDays(TASK_RANGE_DAYS);
+        // 현재 날짜를 기준으로 저번 주 일요일과 이번 주 토요일 계산
+        LocalDate now = LocalDate.now();
+        LocalDate startDate = now.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+        LocalDate endDate = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
 
         // 태스크 데이터 조회
         List<Task> tasksInRange = taskRepository.findTasksWithinDateRange(projectId, startDate, endDate);

@@ -152,9 +152,9 @@ class ProjectServiceTest {
 
         doNothing().when(mockProject).validateOwner(memberId);
         when(projectRepository.findProjectByIdWIthMember(projectId)).thenReturn(Optional.of(mockProject));
-        when(retrospectiveSkillRepository.findTopSkillsByType(projectId, "소프트", PageRequest.of(0, 3)))
+        when(retrospectiveSkillRepository.findTopSkillsByType(projectId, "soft", PageRequest.of(0, 3)))
                 .thenReturn(softSkills);
-        when(retrospectiveSkillRepository.findTopSkillsByType(projectId, "하드", PageRequest.of(0, 3)))
+        when(retrospectiveSkillRepository.findTopSkillsByType(projectId, "hard", PageRequest.of(0, 3)))
                 .thenReturn(hardSkills);
 
 
@@ -299,11 +299,11 @@ class ProjectServiceTest {
         Long projectId = 1L;
         // Mock TaskRetrospectiveSkillDto 리스트
         TaskRetrospectiveSkillDto dto1 = new TaskRetrospectiveSkillDto(1L, LocalDate.now(),
-                LocalDate.now().plusDays(7), null, "소프트", "Communication");
+                LocalDate.now().plusDays(7), null, "soft", "Communication");
         TaskRetrospectiveSkillDto dto2 = new TaskRetrospectiveSkillDto(1L, LocalDate.now(),
-                LocalDate.now().plusDays(7), null, "하드", "Java");
+                LocalDate.now().plusDays(7), null, "hard", "Java");
         TaskRetrospectiveSkillDto dto3 = new TaskRetrospectiveSkillDto(2L,
-                LocalDate.now(), LocalDate.now().plusDays(5), null, "소프트",
+                LocalDate.now(), LocalDate.now().plusDays(5), null, "soft",
                 "Problem Solving");
 
         List<TaskRetrospectiveSkillDto> mockTaskRetrospectives = Arrays.asList(dto1, dto2, dto3);

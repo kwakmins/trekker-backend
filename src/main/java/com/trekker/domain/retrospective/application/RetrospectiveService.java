@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class RetrospectiveService {
 
-    private static final String SOFT_SKILL = "소프트";
-    private static final String HARD_SKILL = "하드";
+    private static final String SOFT_SKILL = "soft";
+    private static final String HARD_SKILL = "hard";
 
 
     private final RetrospectiveRepository retrospectiveRepository;

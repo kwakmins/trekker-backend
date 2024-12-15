@@ -19,8 +19,6 @@ public class RedisRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private static final int TEMP_TOKEN_EXPIRATION = 300;
-    private static final int SOCIAL_REFRESH_TOKEN_EXPIRATION = 3650;
-    private static final String SOCIAL_TOKEN_REDIS_KEY = "social:refreshToken_";
 
     /**
      * Refresh 토큰과 사용자 정보를 Redis에 저장
@@ -104,34 +102,6 @@ public class RedisRepository {
             return authResponse;
         } catch (Exception e) {
             log.warn("Redis에서 임시 토큰 조회 실패: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * 소셜 Refresh Token 저장
-     */
-    public void storeSocialRefreshTokenWithExtendedTTL(String userAccount, String refreshToken) {
-        try {
-            String redisKey = SOCIAL_TOKEN_REDIS_KEY + userAccount;
-            redisTemplate.opsForValue()
-                    .set(redisKey, refreshToken, SOCIAL_REFRESH_TOKEN_EXPIRATION, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.warn("Redis에 소셜 Refresh Token 저장 실패: {}", e.getMessage());
-        }
-    }
-
-    /**
-     * 소셜 Refresh Token 조회 및 삭제
-     */
-    public String fetchAndDeleteSocialRefreshToken(String userAccount) {
-        try {
-            String redisKey = SOCIAL_TOKEN_REDIS_KEY + userAccount;
-            String refreshToken = (String) redisTemplate.opsForValue().get(redisKey);
-            redisTemplate.delete(redisKey);
-            return refreshToken;
-        } catch (Exception e) {
-            log.warn("Redis에서 소셜 Refresh Token 조회 실패: {}", e.getMessage());
             return null;
         }
     }

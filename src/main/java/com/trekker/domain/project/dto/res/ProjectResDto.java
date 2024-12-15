@@ -5,20 +5,24 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record ProjectResDto (
-       Long id,
-       String type,
-       String title,
-       String description,
-       // 시작 날짜
-       LocalDate startDate,
-       //종료 날짜
-       LocalDate endDate,
-       //진행률
-       int progress
-){
+public record ProjectResDto(
 
-    public static ProjectResDto toDto(Project project,int progress) {
+        Long id,
+
+        String type,
+
+        String title,
+
+        String description,
+
+        LocalDate startDate,
+
+        LocalDate endDate,
+        // 진행률
+        int progress
+) {
+
+    public static ProjectResDto toDto(Project project, int progress) {
         return ProjectResDto.builder()
                 .id(project.getId())
                 .type(project.getType())

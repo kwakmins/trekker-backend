@@ -8,8 +8,10 @@ import lombok.Builder;
 
 @Builder
 public record TaskReqDto(
+
         @NotNull
         String name,
+
         @NotNull
         LocalDate startDate,
 

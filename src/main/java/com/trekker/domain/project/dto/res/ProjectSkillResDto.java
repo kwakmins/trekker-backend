@@ -7,16 +7,22 @@ import lombok.Builder;
 
 @Builder
 public record ProjectSkillResDto(
+
         String projectName,
+
         String projectDescription,
-        LocalDate startDate,   // 프로젝트 시작 날짜
-        LocalDate endDate,     // 프로젝트 종료 날짜
+
+        LocalDate startDate,
+
+        LocalDate endDate,
+
         List<String> softSkillList,
+
         List<String> hardSkillList
 
 ) {
 
-    public static ProjectSkillResDto toDto(ProjectSkillDto project,List<String> softSkillList,
+    public static ProjectSkillResDto toDto(ProjectSkillDto project, List<String> softSkillList,
             List<String> hardSkillList) {
 
         return ProjectSkillResDto.builder()

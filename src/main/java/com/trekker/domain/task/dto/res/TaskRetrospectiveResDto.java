@@ -7,15 +7,22 @@ import lombok.Builder;
 
 @Builder
 public record TaskRetrospectiveResDto(
+
         Long taskId,
+
         LocalDate startDate,
+
         LocalDate endDate,
+
         String retrospectiveContent,
+
         List<String> softSkillList,
+
         List<String> hardSkillList
 ) {
 
-    public static TaskRetrospectiveResDto toDto(TaskRetrospectiveSkillDto taskDto, List<String> softSkillList, List<String> hardSkillList) {
+    public static TaskRetrospectiveResDto toDto(TaskRetrospectiveSkillDto taskDto,
+            List<String> softSkillList, List<String> hardSkillList) {
         return TaskRetrospectiveResDto.builder()
                 .taskId(taskDto.taskId())
                 .startDate(taskDto.startDate())

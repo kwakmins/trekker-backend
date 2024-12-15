@@ -6,10 +6,15 @@ import lombok.Builder;
 
 @Builder
 public record TaskResDto(
+
         Long taskId,
+
         String name,
+
         LocalDate start_date,
+
         LocalDate end_date,
+
         Boolean isCompleted
 ) {
 

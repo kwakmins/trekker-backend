@@ -3,29 +3,24 @@ package com.trekker.domain.task.api;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 import com.trekker.domain.project.dto.res.ProjectWithTaskInfoResDto;
+import com.trekker.domain.task.api.docs.TaskApi;
 import com.trekker.domain.task.application.TaskService;
 import com.trekker.domain.task.dto.req.TaskReqDto;
 import com.trekker.global.config.security.annotation.LoginMember;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/project/{projectId}/tasks")
-public class TaskController {
+public class TaskController implements TaskApi {
 
     private final TaskService taskService;
 
@@ -62,9 +57,9 @@ public class TaskController {
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(
             @LoginMember Long memberId,
-            @PathVariable(name = "taskId") Long projectId
+            @PathVariable(name = "taskId") Long taskId
     ) {
-        taskService.deleteTask(memberId, projectId);
+        taskService.deleteTask(memberId, taskId);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 }

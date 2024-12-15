@@ -6,6 +6,12 @@ import lombok.Builder;
 
 @Builder
 public record OnboardingReqDto(
-        @NotNull String name,
-        @NotNull String jobName,
-        ProjectReqDto projectReqDto) {}
+
+        @NotNull
+        String name,
+
+        @NotNull
+        String jobName,
+
+        ProjectReqDto projectReqDto
+) {}

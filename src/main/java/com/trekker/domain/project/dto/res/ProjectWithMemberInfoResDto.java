@@ -6,11 +6,13 @@ import lombok.Builder;
 
 @Builder
 public record ProjectWithMemberInfoResDto(
+
         String name,
+
         String jobName,
+
         List<ProjectResDto> projectList
 ) {
-
 
     public static ProjectWithMemberInfoResDto toDto(Member member,
             List<ProjectResDto> projectList) {

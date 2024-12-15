@@ -38,22 +38,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .httpBasic(
-                        AbstractHttpConfigurer::disable) // HTTP Basic 인증을 비활성화 (JWT 방식을 사용하기 위해서)
-                .csrf(AbstractHttpConfigurer::disable) // CSRF 보호를 비활성화 (JWT 인증은 세션이 아닌 토큰 기반이라 필요 없음)
-                .cors(cors -> cors.configurationSource(
-                        corsConfigurationSource())) // CORS 설정을 활성화하여 corsConfigurationSource()에서 상세 설정을 정의
+                .httpBasic(AbstractHttpConfigurer::disable) // HTTP Basic 인증 비활성화
+                .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-                        STATELESS)) // 세션 정책을 STATELESS로 설정하여 서버에서 세션을 생성하지 않음
+                        STATELESS)) // 세션 정책: STATELESS
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/v1/auth/access/refresh",
+                                .requestMatchers(
+                                        // 인증 없이 접근 가능한 엔드포인트
+                                        "/api/v1/auth/access/refresh",
                                         "/api/v1/auth/refresh/reissue",
                                         "/api/v1/auth/issue-final-token",
-                                        "/uploads/profile-images/**"
-                                        , "/login/oauth2/**", "/oauth2/**", "/error",
-                                        "/favicon.ico").permitAll()
-                                .anyRequest().authenticated())
+                                        "/uploads/profile-images/**",
+                                        "/login/oauth2/**",
+                                        "/oauth2/**",
+                                        "/error",
+                                        "/favicon.ico",
+                                        "/v3/api-docs/**",       // Swagger JSON 문서
+                                        "/swagger-ui/**",        // Swagger UI 리소스
+                                        "/swagger-ui.html"       // Swagger UI 진입점
+                                ).permitAll()
+                                .anyRequest().authenticated()) // 그 외 요청은 인증 필요
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
@@ -69,13 +75,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // 허용된 Origin
         configuration.setAllowedMethods(
-                Arrays.asList("HEAD", "GET", "POST", "DELETE", "PATCH")); // 모든 HTTP 메서드 허용
-        configuration.setAllowedHeaders(List.of("*"));
+                Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH")); // 허용된 HTTP 메서드
+        configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 쿠키를 포함한 요청 허용
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 위의 CORS 설정 적용
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
         return source;
     }
 }

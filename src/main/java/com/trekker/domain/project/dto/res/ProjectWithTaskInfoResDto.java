@@ -9,10 +9,15 @@ import lombok.Builder;
 
 @Builder
 public record ProjectWithTaskInfoResDto(
+
         String title,
+
         String type,
+
         String description,
+
         LocalDate startDate,
+
         LocalDate endDate,
         // 주간 성취 달력
         List<TaskCompletionStatusResDto> weeklyAchievement,
@@ -21,7 +26,8 @@ public record ProjectWithTaskInfoResDto(
 ) {
 
     public static ProjectWithTaskInfoResDto toDto(Project project,
-            List<TaskCompletionStatusResDto> weeklyAchievement, List<TaskResDto> taskList) {
+            List<TaskCompletionStatusResDto> weeklyAchievement,
+            List<TaskResDto> taskList) {
         return ProjectWithTaskInfoResDto.builder()
                 .title(project.getTitle())
                 .type(project.getType())

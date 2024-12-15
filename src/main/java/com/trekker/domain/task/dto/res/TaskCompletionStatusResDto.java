@@ -5,7 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record TaskCompletionStatusResDto(
+
         LocalDate date,
+
         boolean isCompleted
-)
-{ }
+) { }

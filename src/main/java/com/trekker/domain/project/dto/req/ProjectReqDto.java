@@ -9,15 +9,22 @@ import lombok.Builder;
 
 @Builder
 public record ProjectReqDto(
+
         @NotNull
         @Size(max = 20, message = "제목은 최대 20 자까지 입력 가능합니다.")
         String title,
+
         @NotNull
-        @Size(max = 50, message = "제목은 최대 20 자까지 입력 가능합니다.")
+        @Size(max = 50, message = "설명은 최대 50 자까지 입력 가능합니다.")
         String description,
-        @NotNull LocalDate startDate,
+
+        @NotNull
+        LocalDate startDate,
+
         LocalDate endDate,
-        @NotNull String type // 프로젝트 유형 (개인 , 팀)
+
+        @NotNull
+        String type // 프로젝트 유형 (개인 , 팀)
 ) {
 
     public Project toEntity(Member member) {

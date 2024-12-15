@@ -5,7 +5,8 @@ import com.trekker.domain.project.entity.ProjectRetrospective;
 import jakarta.validation.constraints.Size;
 
 public record ProjectRetrospectiveReqDto(
-        @Size(max = 300, message = "제목은 최대 20 자까지 입력 가능합니다.")
+
+        @Size(max = 300, message = "회고 내용은 최대 300 자까지 입력 가능합니다.")
         String content
 ) {
     public ProjectRetrospective toEntity(Project project) {
@@ -14,5 +15,4 @@ public record ProjectRetrospectiveReqDto(
                 .content(this.content)
                 .build();
     }
-
 }

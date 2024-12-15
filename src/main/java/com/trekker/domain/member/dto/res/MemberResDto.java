@@ -5,8 +5,11 @@ import lombok.Builder;
 
 @Builder
 public record MemberResDto(
+
         String name,
+
         String jobName,
+
         String profileImage
 ) {
 

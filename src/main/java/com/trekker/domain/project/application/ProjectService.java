@@ -60,11 +60,10 @@ public class ProjectService {
     }
 
     /**
-     * 사용자의 프로젝트 리스트를 반환하는 메서드.
-     * 회원 정보를 조회하고, 회원이 소유한 프로젝트 리스트를 가져와 진행률과 함께 반환합니다.
+     * 사용자의 프로젝트 리스트를 반환하는 메서드. 회원 정보를 조회하고, 회원이 소유한 프로젝트 리스트를 가져와 진행률과 함께 반환합니다.
      *
      * @param memberId 사용자의 id
-     * @param type  프로젝트 유형 ("개인" 또는 "팀"으로 필터링)
+     * @param type     프로젝트 유형 ("개인" 또는 "팀"으로 필터링)
      * @return 사용자 정보(이름,직군), 프로젝트 정보 및 진행률을 포함한 DTO 리스트
      * @throws BusinessException 회원 정보가 존재하지 않을 경우 예외를 발생
      */
@@ -111,8 +110,10 @@ public class ProjectService {
      * @param projectId 조회할 프로젝트의 ID
      * @return TaskRetrospectiveResDto 리스트
      */
-    public List<TaskRetrospectiveResDto> getProjectRetrospectiveList(Long memberId, Long projectId) {
-        List<TaskRetrospectiveSkillDto> taskSkillDto = taskRepository.findTaskRetrospectivesByProjectIdAndMemberId(projectId, memberId);
+    public List<TaskRetrospectiveResDto> getProjectRetrospectiveList(Long memberId,
+            Long projectId) {
+        List<TaskRetrospectiveSkillDto> taskSkillDto = taskRepository.findTaskRetrospectivesByProjectIdAndMemberId(
+                projectId, memberId);
         // taskId를 기준으로 그룹화
         Map<Long, List<TaskRetrospectiveSkillDto>> groupedByTaskId = taskSkillDto.stream()
                 .collect(Collectors.groupingBy(TaskRetrospectiveSkillDto::taskId));
@@ -195,7 +196,8 @@ public class ProjectService {
     /**
      * 리스트에서 Task의 기본 정보와 스킬 데이터를 추출하여 반환합니다.
      */
-    private TaskRetrospectiveResDto mapToTaskRetrospectiveResDto(List<TaskRetrospectiveSkillDto> taskProjections) {
+    private TaskRetrospectiveResDto mapToTaskRetrospectiveResDto(
+            List<TaskRetrospectiveSkillDto> taskProjections) {
         TaskRetrospectiveSkillDto taskDto = taskProjections.get(0);
 
         return TaskRetrospectiveResDto.toDto(
@@ -209,10 +211,11 @@ public class ProjectService {
      * 특정 스킬 타입에 해당하는 스킬 이름을 추출합니다.
      *
      * @param taskProjections TaskRetrospectiveSkillDto 리스트
-     * @param skillType        추출할 스킬 타입 (예: "소프트", "하드")
+     * @param skillType       추출할 스킬 타입 (예: "소프트", "하드")
      * @return 스킬 이름 리스트
      */
-    private List<String> extractSkills(List<TaskRetrospectiveSkillDto> taskProjections, String skillType) {
+    private List<String> extractSkills(List<TaskRetrospectiveSkillDto> taskProjections,
+            String skillType) {
         return taskProjections.stream()
                 .filter(p -> skillType.equalsIgnoreCase(p.skillType()))
                 .map(TaskRetrospectiveSkillDto::skillName)
@@ -230,7 +233,8 @@ public class ProjectService {
     private Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(
-                        () -> new BusinessException(memberId, "memberId", ErrorCode.MEMBER_NOT_FOUND)
+                        () -> new BusinessException(memberId, "memberId",
+                                ErrorCode.MEMBER_NOT_FOUND)
                 );
     }
 

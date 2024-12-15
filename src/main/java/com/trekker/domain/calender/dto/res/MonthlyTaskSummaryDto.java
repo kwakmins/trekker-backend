@@ -7,10 +7,8 @@ import lombok.Builder;
 public record MonthlyTaskSummaryDto(
         // 시작일
         LocalDate startDate,
-
         // 종료일
         LocalDate endDate,
-
         // 할 일 이름
         String name
 ) {

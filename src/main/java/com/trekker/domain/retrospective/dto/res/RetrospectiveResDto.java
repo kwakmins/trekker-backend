@@ -9,13 +9,10 @@ public record RetrospectiveResDto(
 
         String taskName,
 
-        // 소프트 스틸 목록
         List<String> softSkillList,
 
-        // 하드 스킬 목록
         List<String> hardSkillList,
 
-        // 회고  내용
         String content
 ) {
 

@@ -7,6 +7,7 @@ import com.trekker.global.config.security.handler.CustomAccessDeniedHandler;
 import com.trekker.global.config.security.handler.CustomAuthenticationEntryPoint;
 import com.trekker.global.config.security.handler.CustomLoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,6 +35,9 @@ public class SecurityConfig {
     private final CustomLoginSuccessHandler loginSuccessHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Value("${host.name}")
+    private String HOST_NAME;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -76,7 +80,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // 허용된 Origin
+        configuration.setAllowedOrigins(List.of(HOST_NAME)); // 허용된 Origin
         configuration.setAllowedMethods(
                 Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH")); // 허용된 HTTP 메서드
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 허용

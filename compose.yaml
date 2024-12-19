@@ -5,6 +5,7 @@ services:
       - service
     volumes:
       - mysql-volume:/var/lib/mysql
+      - ./init/init.sql:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: root5479
       MYSQL_DATABASE: root
@@ -19,6 +20,22 @@ services:
     image: redis:latest
     networks:
       - service
+
+  next:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    networks:
+      - service
+    restart: always
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+    expose:
+      - 3000
 
   was:
     build:
@@ -38,11 +55,13 @@ services:
       - redis
     env_file:
       - .env.prod
+    expose:
+      - 5479
 
   web:
     image: nginx
     ports:
-      - "5478:80"
+      - "80:80"
     networks:
       - service
     volumes:
@@ -55,6 +74,7 @@ services:
           memory: 128M
     depends_on:
       - was
+      - next
 
 networks:
   service:
